@@ -73,7 +73,9 @@ const UI = {
   },
 
   renderDirty() {
+    const progressDirty = this.dirty.hud || this.dirty.nav;
     if (this.dirty.hud) { this.renderHUD(); this.dirty.hud = false; }
+    if (progressDirty) this.renderProgress();
     if (this.dirty.nav) { this.renderNavBadges(); this.dirty.nav = false; }
     if (this.activeTab === 'enclosures' && this.dirty.enclosures) { this.renderEnclosures(); this.dirty.enclosures = false; }
     if (this.activeTab === 'incubator' && this.dirty.incubator) { this.renderIncubator(); this.dirty.incubator = false; }

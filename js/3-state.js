@@ -16,6 +16,10 @@ function createDefaultState() {
     guardianDefeated: false,
     guardianUnlockedByShards: false,
 
+    // Progression par paliers (voir CONFIG.PROGRESSION) & mode enseignant
+    unlocked: { enclosures: false, producer: false, manadex: false, fusion: false, guardian: false },
+    teacherMode: false,
+
     // Enclos : 1 débloqué au départ contenant déjà le 1er Tupa Corail
     enclosures: [
       { id: 0, name: 'Bassin du Lagon #1', unlocked: true, unstable: false, slots: ['sp_init_1', null, null] },
@@ -98,8 +102,13 @@ const Storage = {
       mana: { ...def.mana, ...(saved.mana || {}) },
       manaSelection: { ...def.manaSelection, ...(saved.manaSelection || {}) },
       stats: { ...def.stats, ...(saved.stats || {}) },
+      unlocked: { ...def.unlocked, ...(saved.unlocked || {}) },
       version: CONFIG.SAVE_VERSION
     };
+    // Parties créées avant la progression par paliers : tout reste débloqué
+    if (!saved.unlocked) {
+      for (const k of Object.keys(merged.unlocked)) merged.unlocked[k] = true;
+    }
     if (!Array.isArray(merged.enclosures) || merged.enclosures.length < 4) merged.enclosures = def.enclosures;
     if (!Array.isArray(merged.incubators) || merged.incubators.length < 3) merged.incubators = def.incubators;
     if (!merged.specimens || typeof merged.specimens !== 'object') merged.specimens = def.specimens;

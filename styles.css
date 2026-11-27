@@ -1105,3 +1105,34 @@ html, body {
   .quiz-choices { grid-template-columns: 1fr; }
   .nav-tab { flex: 1 1 44%; padding: 9px 8px; font-size: 0.82rem; }
 }
+
+/* ========================================================================
+   PROGRESSION : onglets verrouillés, mission du moment
+   ======================================================================== */
+.nav-tab.locked {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+.nav-tab.locked > span:first-child::before { content: '🔒 '; }
+
+.nav-tab.pulse {
+  border-color: var(--accent-amber);
+  animation: tabPulse 1.4s ease-in-out infinite;
+}
+@keyframes tabPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55); }
+  50% { box-shadow: 0 0 0 7px rgba(251, 191, 36, 0); }
+}
+
+.mission-bubble {
+  min-height: 44px;
+  margin-bottom: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-amber);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(14, 116, 144, 0.25));
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+}

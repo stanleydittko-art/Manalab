@@ -42,6 +42,7 @@
         </div>
         <div class="hud-actions">
           <button id="btn-sound" class="btn btn-sm btn-ghost" title="Activer/Couper le son">🔊 Son : ON</button>
+          <button id="btn-teacher" class="btn btn-sm btn-ghost">🎓 Prof</button>
           <button id="btn-reset" class="btn btn-sm btn-ghost" title="Réinitialiser la partie">↺ Reset</button>
         </div>
       </div>
@@ -56,12 +57,12 @@
           <div class="stat-label"><span>Stocks de Mana</span><span style="font-size:0.68rem;color:#8cb2c4;">Brut / Pur / Prism.</span></div>
           <div class="mana-strip">
             <span class="mana-badge mana-raw" title="Mana Brut (Facile)">● <span id="hud-mana-raw">0</span></span>
-            <span class="mana-badge mana-pure" title="Mana Pur (Moyen)">◆ <span id="hud-mana-pure">0</span></span>
-            <span class="mana-badge mana-prismatic" title="Mana Prismatique (Difficile)">★ <span id="hud-mana-prismatic">0</span></span>
+            <span id="badge-mana-pure" class="mana-badge mana-pure" title="Mana Pur (Moyen)">◆ <span id="hud-mana-pure">0</span></span>
+            <span id="badge-mana-prismatic" class="mana-badge mana-prismatic" title="Mana Prismatique (Difficile)">★ <span id="hud-mana-prismatic">0</span></span>
           </div>
         </div>
 
-        <div class="stat-chip">
+        <div id="chip-streak" class="stat-chip">
           <div class="stat-label"><span>Série / Combo</span><span id="hud-chroma-chance" class="stat-sub">Chroma 1%</span></div>
           <div class="stat-value">
             <span>🔥 <span id="hud-streak">0</span></span>
@@ -69,7 +70,7 @@
           </div>
         </div>
 
-        <div class="stat-chip">
+        <div id="chip-dex" class="stat-chip">
           <div class="stat-label"><span>ManaDex</span><span id="hud-pity-mini" class="stat-sub">Chance 0%</span></div>
           <div class="stat-value">
             <span id="hud-dex-count">0 / 11</span>
@@ -78,6 +79,9 @@
         </div>
       </div>
     </header>
+
+    <!-- Mission du moment : un seul objectif à la fois -->
+    <div id="mission-bubble" class="mission-bubble" role="button" tabindex="0" style="display:none;"></div>
 
     <!-- ======================================================================
          NAVIGATION PAR ONGLETS
@@ -136,6 +140,7 @@
   <script src="js/8-ui.js" defer></script>
   <script src="js/8-ui-tabs.js" defer></script>
   <script src="js/8-ui-modals.js" defer></script>
+  <script src="js/8-ui-progress.js" defer></script>
   <script src="js/8-ui-events.js" defer></script>
   <script src="js/9-main.js" defer></script>
 </body>

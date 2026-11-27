@@ -4,7 +4,7 @@
    ========================================================================== */
 const CONFIG = {
   SAVE_KEY: 'manalab_lagon_v1',
-  SAVE_VERSION: 1,
+  SAVE_VERSION: 2,
   MODE: 'PEDAGO', // 'PEDAGO' | 'COMMERCIAL' (futur pont SDK Pub / Gemmes)
   TICK_MS: 1000,
   AUTOSAVE_MS: 15000,
@@ -52,6 +52,18 @@ const CONFIG = {
   FUSION_SAFE_COUNT: 3,
   FUSION_RISKY_COUNT: 2,
   FUSION_RISKY_CHANCE: 0.65,
+
+  // Mode enseignant : code de déblocage de toutes les fonctionnalités
+  TEACHER_CODE: 'secret',
+
+  // Progression par paliers : onglets et mécaniques débloqués au fil du jeu
+  PROGRESSION: {
+    enclosures: { eggsHatched: 1, label: 'Enclos',   hint: 'Fais éclore ton 1er œuf' },
+    producer:   { eggsHatched: 3, label: 'Production, Série et Surcharge', hint: 'Fais éclore 3 œufs' },
+    manadex:    { species: 3,     label: 'ManaDex',  hint: 'Découvre 3 espèces' },
+    fusion:     {                 label: 'Fusion',   hint: 'Obtiens 2 exemplaires de la même espèce' },
+    guardian:   {                 label: 'Gardien Alpha', hint: 'Découvre 5 espèces' }
+  },
 
   RARITY_ORDER: ['common', 'rare', 'epic', 'legendary'],
   RARITY_LABELS: {

@@ -106,7 +106,7 @@ Object.assign(UI, {
 
         <div style="display:flex;flex-direction:column;gap:10px;">
           <button id="btn-hatch-now" class="btn btn-lg btn-gold">✨ Ouvrir l'Œuf maintenant</button>
-          ${!inc.egg.overchargeTried ? `
+          ${!inc.egg.overchargeTried && state.unlocked.producer ? `
             <button id="btn-overcharge" class="btn btn-purple">
               ⚡ STOP OU ENCORE : Surcharger (Défi 12s)
             </button>

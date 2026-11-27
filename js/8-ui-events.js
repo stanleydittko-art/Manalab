@@ -12,7 +12,7 @@ Object.assign(UI, {
     document.querySelectorAll('.tab-section').forEach(sec => {
       sec.classList.toggle('active', sec.id === `tab-${tabName}`);
     });
-    this.markDirty([tabName]);
+    this.markDirty([tabName, 'nav']);
     this.renderDirty();
   },
 
@@ -26,6 +26,16 @@ Object.assign(UI, {
       Storage.save();
     });
 
+    document.getElementById('btn-teacher').addEventListener('click', () => {
+      AudioFX.play('click');
+      this.openTeacherModal();
+    });
+
+    document.getElementById('mission-bubble').addEventListener('click', (ev) => {
+      const tab = ev.currentTarget.dataset.tab;
+      if (tab) { AudioFX.play('click'); this.goToTab(tab); }
+    });
+
     document.getElementById('btn-reset').addEventListener('click', () => {
       AudioFX.play('click');
       this.openResetConfirmModal();
@@ -37,10 +47,10 @@ Object.assign(UI, {
       if (!btn) return;
       AudioFX.play('click');
       if (btn.dataset.action === 'open-guardian') {
-        this.openGuardianModal();
+        this.goToTab('guardian');
         return;
       }
-      if (btn.dataset.tab) this.switchTab(btn.dataset.tab);
+      if (btn.dataset.tab) this.goToTab(btn.dataset.tab);
     });
 
     // Délégation globale sur le contenu principal

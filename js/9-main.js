@@ -23,6 +23,9 @@ function init() {
   });
 
   UI.bindEvents();
+  GameEngine.checkUnlocks();
+  // Nouvelle partie : l'onglet Enclos est verrouillé, on démarre sur Exercices
+  UI.switchTab(state.unlocked.enclosures ? 'enclosures' : 'exercises');
   UI.renderDirty();
 
   // Afficher les gains hors-ligne s'il y en a eu
