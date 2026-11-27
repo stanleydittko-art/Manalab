@@ -44,7 +44,10 @@ manalab/
     ├── 5-engine.js       # Cœur logique PUR (ProbaEngine, GameEngine, tick) — ZÉRO DOM
     ├── 6-bridge.js       # EffortBridge : pont unique Exercices <-> futures Pubs/Gemmes
     ├── 7-fx.js           # Canvas 60 FPS (bulles, confettis, textes flottants)
-    ├── 8-ui.js           # Rendu DOM réactif (dirty flags), modales, événements tactiles
+    ├── 8-ui.js           # Noyau UI (objet UI, HUD, dirty flags, toasts)
+    ├── 8-ui-tabs.js      # Rendu des onglets (Object.assign(UI, …))
+    ├── 8-ui-modals.js    # Modales (quiz, éclosion, fusion, Gardien…)
+    ├── 8-ui-events.js    # Événements tactiles (délégation)
     └── 9-main.js         # Point d'entrée, câblage Engine<->UI/FX, boucles tick & RAF
 ```
 
@@ -55,7 +58,7 @@ manalab/
 ## 4. Règles d'économie de jetons (Anti-dépassement)
 
 1. **Lecture ciblée obligatoire :** Ne lis **que** les fichiers strictement nécessaires à la demande (généralement 1 à 2 fichiers). Ne scanne jamais tout le dépôt inutilement.
-2. **Plafond de 350–400 lignes par fichier JS :** Si un fichier dépasse 400 lignes (ex. `js/2-data.js` avec plusieurs biomes ou `js/8-ui.js`), propose de le scinder proprement (ex. `js/data/biome1.js`, `js/data/exercises.js`, `js/ui/modals.js`) **avant** de le faire.
+2. **Plafond de 500 lignes (tolérance 600) par fichier JS :** Si un fichier dépasse 500 lignes (ex. `js/2-data.js` avec plusieurs biomes ou `js/8-ui.js`), propose de le scinder proprement (ex. `js/data/biome1.js`, `js/data/exercises.js`, `js/ui/modals.js`) **avant** de le faire.
 3. **Éditions chirurgicales uniquement :** Modifie uniquement les fonctions ou blocs concernés. **INTERDICTION** de réécrire un fichier complet ou de reformater du code non touché.
 4. **Assets légers :** Les créatures et icônes utilisent du SVG inline compact ou du Canvas. Aucune image lourde en base64.
 
