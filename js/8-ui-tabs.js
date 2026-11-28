@@ -43,7 +43,7 @@ Object.assign(UI, {
 
         ${enc.unstable ? `
           <div class="unstable-alert">
-            <span>⚠️ <strong>ADN instable (-50% prod.)</strong> — Révision mémoire requise !</span>
+            <span>⚠️ <strong>ADN instable</strong> ${this.tipBtn('instability')}</span>
             <button class="btn btn-sm btn-danger" data-action="stabilize" data-enc="${enc.id}">🧬 Stabiliser (10s)</button>
           </div>
         ` : ''}
@@ -53,7 +53,7 @@ Object.assign(UI, {
         <div class="synergy-banner">
           ${stats.activeSynergy
             ? `<span>✨ Synergie : <strong>${stats.activeSynergy.name}</strong></span><strong style="color:#2ef2e0;">+${Math.round(stats.synBonus * 100)}%</strong>`
-            : `<span style="color:var(--text-muted);">💡 Astuce : combine 2 types différents (ex. Flore + Faune) pour +25% !</span>`}
+            : `<span style="color:var(--text-muted);">💡 2 types différents = +25 %</span>`}
         </div>
       </div>`;
     }).join('');
@@ -65,7 +65,7 @@ Object.assign(UI, {
 
     const reserveHtml = reserve.length === 0
       ? `<div style="text-align:center;padding:18px;color:var(--text-muted);font-size:0.86rem;">
-          Ta réserve est vide. Fais des <strong>Exercices</strong> puis passe à l'<strong>Incubateur</strong> pour faire éclore de nouveaux spécimens !
+          Réserve vide. Fais éclore des œufs !
         </div>`
       : `<div class="inventory-grid">
           ${reserve.map(sp => {
@@ -91,7 +91,7 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">🏝️ Enclos du Lagon Bioluminescent</div>
-            <div class="panel-desc">Place tes mutants pour générer des Éclats en continu et activer des synergies d'écosystème.</div>
+            <div class="panel-desc">Place tes créatures pour produire des Éclats. ${this.tipBtn('enclosures')}</div>
           </div>
           <button class="btn btn-sm btn-ghost" data-action="goto-tab" data-target="exercises">⚡ Gagner du Mana</button>
         </div>
@@ -114,7 +114,7 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">📦 Réserve du Laboratoire (${reserve.length})</div>
-            <div class="panel-desc">Les spécimens en réserve peuvent être placés en enclos ou fusionnés dans l'onglet Fusion.</div>
+            <div class="panel-desc">Créatures à placer en enclos.</div>
           </div>
         </div>
         ${reserveHtml}
@@ -125,6 +125,9 @@ Object.assign(UI, {
   // --- ONGLET 2 : INCUBATEUR & PROBABILITÉS ---
   renderIncubator() {
     const container = document.getElementById('tab-incubator');
+    // Mode simplifié (avant le palier Enclos) : 1 seul bouton, dosage automatique
+    const simple = !state.unlocked.enclosures && !state.teacherMode;
+    if (simple) GameEngine.setAutoDose();
     const sel = state.manaSelection;
     const totalSel = sel.raw + sel.pure + sel.prismatic;
     const odds = ProbaEngine.computeOdds(sel);
@@ -186,15 +189,15 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">🧪 Synthèse & Probabilités en Direct</div>
-            <div class="panel-desc">Injecte jusqu'à ${CONFIG.MAX_MANA_PER_EGG} doses de Mana pour manipuler les pourcentages avant d'incuber.</div>
+            <div class="panel-desc">${simple ? 'Tes chances d’obtenir chaque rareté.' : 'Ajoute du Mana pour changer les pourcentages.'} ${this.tipBtn(simple ? 'incubator' : 'mana')}</div>
           </div>
-          <span class="chromatic-badge">🌈 Chance Chromatique : ${chromaPct}%</span>
+          ${state.unlocked.producer ? `<span class="chromatic-badge">🌈 Chroma : ${chromaPct}%</span>` : ''}
         </div>
 
         <div class="proba-bar-wrap">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
             <strong style="font-size:0.88rem;">
-              ${odds.pityTriggered ? '🔥 JAUGE DE CHANCE À 100% : Épique ou Légendaire GARANTI !' : `Distribution de l'œuf (${totalSel}/${CONFIG.MAX_MANA_PER_EGG} doses injectées)`}
+              ${odds.pityTriggered ? '🔥 JAUGE DE CHANCE À 100% : Épique ou Légendaire GARANTI !' : (simple ? 'Chances de ton œuf' : `Distribution de l'œuf (${totalSel}/${CONFIG.MAX_MANA_PER_EGG} doses injectées)`)}
             </strong>
             <span style="font-size:0.76rem;color:var(--text-muted);">Total exact : 100%</span>
           </div>
@@ -213,9 +216,9 @@ Object.assign(UI, {
             <div class="proba-legend-item"><span class="rarity-pill rar-legendary">Légendaire</span><strong>${odds.legendary}%</strong></div>
           </div>
 
-          <div class="pity-bar-wrap">
+          <div class="pity-bar-wrap" ${state.unlocked.producer || state.teacherMode ? '' : 'style="display:none;"'}>
             <div style="display:flex;justify-content:space-between;font-size:0.78rem;">
-              <span>🍀 <strong>Jauge de Chance Garantie (Pity)</strong> : +10% par Commun tiré</span>
+              <span>🍀 <strong>Chance garantie</strong> ${this.tipBtn('pity')}</span>
               <strong style="color:#facc15;">${state.pity}% / 100%</strong>
             </div>
             <div class="progress-track">
@@ -224,11 +227,11 @@ Object.assign(UI, {
           </div>
         </div>
 
-        <div class="mana-selector-grid">${manaControls}</div>
+        <div class="mana-selector-grid" ${simple ? 'style="display:none;"' : ''}>${manaControls}</div>
 
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
           <button class="btn btn-lg btn-primary" data-action="start-incubation" ${(!freeInc || totalSel === 0) ? 'disabled' : ''}>
-            🥚 Lancer l'Incubation (${Math.round(CONFIG.INCUBATION_BASE_SEC + totalSel * CONFIG.INCUBATION_PER_MANA_SEC)}s)
+            ${simple ? '🥚 Lancer l’œuf' : '🥚 Lancer l’incubation'} (${Math.round(CONFIG.INCUBATION_BASE_SEC + totalSel * CONFIG.INCUBATION_PER_MANA_SEC)}s)
           </button>
           ${totalSel === 0 ? `<button class="btn btn-sm btn-ghost" data-action="goto-tab" data-target="exercises">⚡ Faire un exercice pour gagner du Mana</button>` : ''}
         </div>
@@ -238,7 +241,7 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">🥚 Cuves d'Incubation</div>
-            <div class="panel-desc">Quand un œuf est prêt, tu peux l'ouvrir ou risquer une <strong>Surcharge (Stop ou Encore)</strong> !</div>
+            <div class="panel-desc">Ouvre l’œuf quand il est prêt. ${state.unlocked.producer ? this.tipBtn('overcharge') : ''}</div>
           </div>
           ${nextLockedInc ? `
             <button class="btn btn-sm btn-gold" data-action="unlock-incubator" data-inc="${nextLockedInc.id}" ${state.shards >= CONFIG.INCUBATOR_COSTS[nextLockedInc.id] ? '' : 'disabled'}>
@@ -263,11 +266,11 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">⚡ Extraction de Mana par Exercices</div>
-            <div class="panel-desc">Plus le défi est difficile, plus le Mana extrait fait grimper tes probabilités d'Épique et Légendaire !</div>
+            <div class="panel-desc">Réponds juste pour gagner du Mana. ${this.tipBtn('exercises')}</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <span class="biome-pill">Précision : ${accuracy}%</span>
-            <span class="chromatic-badge">🔥 Série ${state.streak} → Chroma ${chromaPct}%</span>
+            ${state.unlocked.producer ? `<span class="chromatic-badge">🔥 Série ${state.streak} → Chroma ${chromaPct}% ${this.tipBtn('streak')}</span>` : ''}
           </div>
         </div>
 
@@ -276,7 +279,7 @@ Object.assign(UI, {
             <div>
               <span class="rarity-pill rar-common">★ Facile</span>
               <h3 style="margin:8px 0 4px;">Calcul Mental Rapide</h3>
-              <p style="font-size:0.83rem;color:var(--text-muted);">Additions, soustractions, tables de multiplication et moitiés.</p>
+              <p style="font-size:0.83rem;color:var(--text-muted);">Calcul mental.</p>
             </div>
             <div style="font-size:0.82rem;color:#a7f3d0;">
               Récompense : <strong>+1 Mana Brut ●</strong> + 8 ✦
@@ -288,30 +291,27 @@ Object.assign(UI, {
             <div>
               <span class="rarity-pill rar-rare">★★ Moyen</span>
               <h3 style="margin:8px 0 4px;">Pourcentages & Probas Simples</h3>
-              <p style="font-size:0.83rem;color:var(--text-muted);">10%, 25%, 50%, 75%, multiplications et tirages de probabilités simples.</p>
+              <p style="font-size:0.83rem;color:var(--text-muted);">Pourcentages et probabilités simples.</p>
             </div>
             <div style="font-size:0.82rem;color:#bae6fd;">
               Récompense : <strong>+1 Mana Pur ◆</strong> + 18 ✦
             </div>
-            <button class="btn btn-primary" data-action="start-exercise" data-diff="medium">▶ Lancer (Moyen)</button>
+            ${this.tierButton('medium', 'btn-primary', 'Moyen')}
           </div>
 
           <div class="tier-card hard">
             <div>
               <span class="rarity-pill rar-epic">★★★ Difficile</span>
               <h3 style="margin:8px 0 4px;">Probas Avancées & % Inverses</h3>
-              <p style="font-size:0.83rem;color:var(--text-muted);">Retrouver 100%, événements complémentaires, unions et tirages indépendants.</p>
+              <p style="font-size:0.83rem;color:var(--text-muted);">Probabilités avancées.</p>
             </div>
             <div style="font-size:0.82rem;color:#f3e8ff;">
               Récompense : <strong>+1 Mana Prismatique ★</strong> + 35 ✦
             </div>
-            <button class="btn btn-purple" data-action="start-exercise" data-diff="hard">▶ Lancer (Difficile)</button>
+            ${this.tierButton('hard', 'btn-purple', 'Difficile')}
           </div>
         </div>
 
-        <div style="margin-top:14px;padding:12px;border-radius:var(--radius-sm);background:rgba(46,242,224,0.08);border:1px solid rgba(46,242,224,0.22);font-size:0.82rem;color:#cde8f5;">
-          🔥 <strong>Règle de Série (Combo) :</strong> Chaque bonne réponse d'affilée ajoute <strong>+5% de chance Chromatique</strong> (spécimen arc-en-ciel valant <strong>×3</strong>), et chaque palier de 3 réussites offre <strong>+1 dose de Mana bonus</strong> ! Attention : une erreur remet le combo à 0.
-        </div>
       </div>
     `;
   },
@@ -371,7 +371,7 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">🧬 Chambre de Fusion Probabiliste</div>
-            <div class="panel-desc">Compare l'espérance de gain : sécurise avec 3 doublons (100%) ou tente le risque avec 2 doublons (65% succès, 35% de perdre 1 spécimen) !</div>
+            <div class="panel-desc">3 doublons = sûr. 2 doublons = risqué. ${this.tipBtn('fusion')}</div>
           </div>
         </div>
         ${listHtml}
@@ -411,7 +411,7 @@ Object.assign(UI, {
         <div class="panel-header">
           <div>
             <div class="panel-title">📘 ManaDex — Lagon Bioluminescent</div>
-            <div class="panel-desc">Découvre les ${SPECIES_LIST.length} spécimens mutants et leurs variantes Chromatiques ultra-rares.</div>
+            <div class="panel-desc">Découvre les ${SPECIES_LIST.length} espèces. ${this.tipBtn('manadex')}</div>
           </div>
           <span class="biome-pill">${discovered} / ${SPECIES_LIST.length} (${pct}%)</span>
         </div>
@@ -419,6 +419,7 @@ Object.assign(UI, {
           <div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,#22d39c,#38bdf8,#facc15);"></div>
         </div>
         <div class="manadex-grid">${cardsHtml}</div>
+        ${this.achievementsHtml()}
       </div>
     `;
   },

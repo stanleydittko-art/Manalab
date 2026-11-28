@@ -36,17 +36,23 @@ manalab/
 ├── styles.css            # Design system mobile-first (lagon bioluminescent)
 ├── manifest.json         # Métadonnées PWA (icône, plein écran, thème)
 ├── sw.js                 # Service Worker (cache 100 % hors-ligne)
+├── tests/run.js          # Tests auto : `node tests/run.js` (lancés aussi par GitHub Actions)
 └── js/
     ├── 1-config.js       # Constantes, probabilités, coûts, timers, MODE ('PEDAGO'|'COMMERCIAL')
-    ├── 2-data.js         # Espèces, SVG, synergies, biomes, générateurs d'exercices
+    ├── 2-data.js         # Espèces, SVG, synergies, biomes
+    ├── 2-exercises.js    # Générateurs d'exercices (niveau de classe, catégories)
+    ├── 2-tips.js         # Textes d'aide ❓ et liste des succès
     ├── 3-state.js        # État vivant (state), localStorage, migration, gains hors-ligne
     ├── 4-utils.js        # RNG pondéré, formatage nombres/durées, Web Audio synthétique
     ├── 5-engine.js       # Cœur logique PUR (ProbaEngine, GameEngine, tick) — ZÉRO DOM
+    ├── 5-engine-progress.js # Paliers, mission, succès, bilan (Object.assign(GameEngine, …))
     ├── 6-bridge.js       # EffortBridge : pont unique Exercices <-> futures Pubs/Gemmes
     ├── 7-fx.js           # Canvas 60 FPS (bulles, confettis, textes flottants)
     ├── 8-ui.js           # Noyau UI (objet UI, HUD, dirty flags, toasts)
     ├── 8-ui-tabs.js      # Rendu des onglets (Object.assign(UI, …))
     ├── 8-ui-modals.js    # Modales (quiz, éclosion, fusion, Gardien…)
+    ├── 8-ui-progress.js  # Onglets verrouillés, mission, aides ❓, code enseignant
+    ├── 8-ui-settings.js  # Réglages, export/import, panneau enseignant, bilan, succès
     ├── 8-ui-events.js    # Événements tactiles (délégation)
     └── 9-main.js         # Point d'entrée, câblage Engine<->UI/FX, boucles tick & RAF
 ```
@@ -103,7 +109,7 @@ Pour toute tâche qui touche plus d'un fichier ou ajoute une mécanique/un biome
   * `chore(pwa): met à jour le cache sw.js en v3`
 
 ### Vérifications obligatoires avant de conclure
-Avant de livrer une modification, vérifie systématiquement :
+Avant de livrer une modification, lance `node tests/run.js` puis vérifie systématiquement :
 1. Aucune erreur de syntaxe ni d'import/export relatif (`./...js`) cassé.
 2. Les probabilités affichées dans l'incubateur somment toujours exactement à **100 %**.
 3. Les sauvegardes existantes se chargent sans crash (`Storage.migrate`).

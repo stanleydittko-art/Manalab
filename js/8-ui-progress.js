@@ -62,12 +62,48 @@ Object.assign(UI, {
     else this.switchTab(tabName);
   },
 
+  // --- Aides contextuelles (bouton ❓) ---
+  tipBtn(key) {
+    return `<button class="tip-btn" data-action="show-tip" data-tip="${key}" aria-label="Aide">❓</button>`;
+  },
+
+  showTip(key) {
+    const tip = TIPS[key];
+    if (!tip) return;
+    state.seenTips[key] = true;
+    this.openModal(`
+      <div style="text-align:center;">
+        <h2 style="margin-bottom:10px;">${tip.title}</h2>
+        <p style="font-size:0.95rem;line-height:1.45;margin-bottom:16px;">${tip.text}</p>
+        <button id="btn-tip-ok" class="btn btn-primary" style="width:100%;">OK, compris !</button>
+      </div>
+    `);
+    document.getElementById('btn-tip-ok').addEventListener('click', () => this.closeModal());
+  },
+
+  // Explication d'une seule phrase à la 1re visite d'un onglet
+  maybeShowFirstTip(tabName) {
+    if (FIRST_VISIT_TIPS.includes(tabName) && !state.seenTips[tabName] && !this._modalOpen) {
+      this.showTip(tabName);
+      Storage.save();
+    }
+  },
+
+  // Bouton de lancement d'un exercice, ou condition de déblocage du palier
+  tierButton(diff, cls, label) {
+    if (GameEngine.isExerciseTierOpen(diff)) {
+      return `<button class="btn ${cls}" data-action="start-exercise" data-diff="${diff}">▶ Lancer (${label})</button>`;
+    }
+    const need = CONFIG.EXERCISE_TIER_REQ[diff];
+    return `<button class="btn btn-ghost" disabled>🔒 ${state.stats.exercisesWon}/${need} bonnes réponses</button>`;
+  },
+
   openTeacherModal() {
     this.openModal(`
       <div style="text-align:center;">
         <h2 style="margin-bottom:8px;">🎓 Mode enseignant</h2>
         <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:12px;">
-          Saisis le code pour débloquer toutes les fonctionnalités.
+          Saisis le code enseignant.
         </p>
         <input id="teacher-code" type="password" autocomplete="off" autocapitalize="off"
           style="width:100%;min-height:44px;padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(0,0,0,0.35);color:#fff;font-size:1rem;margin-bottom:12px;">
@@ -80,11 +116,7 @@ Object.assign(UI, {
     const submit = () => {
       const val = document.getElementById('teacher-code').value.trim();
       if (val === CONFIG.TEACHER_CODE) {
-        GameEngine.unlockAll();
-        Storage.save();
-        this.closeModal();
-        this.showToast('🎓 Mode enseignant : tout est débloqué.', 'gold');
-        this.renderDirty();
+        this.openTeacherPanel();
       } else {
         this.showToast('Code incorrect.', 'danger');
       }

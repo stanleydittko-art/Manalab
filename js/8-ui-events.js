@@ -14,6 +14,7 @@ Object.assign(UI, {
     });
     this.markDirty([tabName, 'nav']);
     this.renderDirty();
+    this.maybeShowFirstTip(tabName);
   },
 
   bindEvents() {
@@ -26,19 +27,14 @@ Object.assign(UI, {
       Storage.save();
     });
 
-    document.getElementById('btn-teacher').addEventListener('click', () => {
+    document.getElementById('btn-settings').addEventListener('click', () => {
       AudioFX.play('click');
-      this.openTeacherModal();
+      this.openSettingsModal();
     });
 
     document.getElementById('mission-bubble').addEventListener('click', (ev) => {
       const tab = ev.currentTarget.dataset.tab;
       if (tab) { AudioFX.play('click'); this.goToTab(tab); }
-    });
-
-    document.getElementById('btn-reset').addEventListener('click', () => {
-      AudioFX.play('click');
-      this.openResetConfirmModal();
     });
 
     // Navigation par onglets
@@ -137,8 +133,14 @@ Object.assign(UI, {
           this.openHatchModal(Number(el.dataset.inc));
           break;
 
+        case 'show-tip':
+          AudioFX.play('click');
+          this.showTip(el.dataset.tip);
+          break;
+
         case 'start-exercise': {
           const diff = el.dataset.diff;
+          if (!GameEngine.isExerciseTierOpen(diff)) break;
           EffortBridge.requestAction(
             'EARN_MANA',
             diff,

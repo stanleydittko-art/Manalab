@@ -6,6 +6,8 @@
 function init() {
   Storage.load();
   FXRenderer.init();
+  ExerciseGenerators.grade = state.grade || 4;
+  UI.applySettings();
 
   // Brancher le gestionnaire pédagogique dans le pont EffortBridge
   EffortBridge.setPedagoHandler((cfg, onSuccess, onFail) => {
@@ -54,8 +56,12 @@ function init() {
 
 window.addEventListener('load', init);
 
-// Enregistrement du Service Worker (mode hors-ligne PWA)
+// Enregistrement du Service Worker (mode hors-ligne PWA) + avis de nouvelle version
 if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController) UI.showToast('🔄 Nouvelle version installée : recharge la page.', 'gold');
+  });
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });

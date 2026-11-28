@@ -65,6 +65,9 @@ const CONFIG = {
     guardian:   {                 label: 'Gardien Alpha', hint: 'Découvre 5 espèces' }
   },
 
+  // Paliers d'exercices : bonnes réponses nécessaires pour ouvrir Moyen / Difficile
+  EXERCISE_TIER_REQ: { easy: 0, medium: 5, hard: 15 },
+
   RARITY_ORDER: ['common', 'rare', 'epic', 'legendary'],
   RARITY_LABELS: {
     common: 'Commun',

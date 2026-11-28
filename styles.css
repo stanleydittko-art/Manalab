@@ -1158,3 +1158,74 @@ html, body {
   .hud-hint { display: none; }
   .nav-bar { gap: 6px; margin-bottom: 12px; }
 }
+
+/* Bouton d'aide ❓ */
+.tip-btn {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -10px -4px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: inherit;
+  vertical-align: middle;
+}
+
+/* Réglages, sauvegarde, succès, « Pourquoi ? » */
+.code-area {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 0.72rem;
+  word-break: break-all;
+  resize: none;
+}
+.why-box {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  font-size: 0.86rem;
+}
+.achv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.achv {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(140, 178, 196, 0.2);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+.achv.got { border-color: var(--accent-amber); color: #fff; background: rgba(251, 191, 36, 0.12); }
+.achv-ico { font-size: 1.2rem; }
+
+.quiz-choice-btn.wrong { animation: shake 0.3s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* Doigt qui montre l'onglet à ouvrir (mission du moment) */
+.nav-tab.pulse::after {
+  content: '👆';
+  position: absolute;
+  right: 6px;
+  bottom: -14px;
+  font-size: 1.1rem;
+  animation: fingerBob 1s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes fingerBob { 50% { transform: translateY(-5px); } }
+
+/* Accessibilité */
+html.big-font { font-size: 118%; }
+html.high-contrast {
+  --text-muted: #d6eaf2;
+  --text-dim: #b4d0dc;
+  --glass-border: rgba(150, 255, 245, 0.7);
+  --glass-bg: rgba(0, 8, 16, 0.95);
+}

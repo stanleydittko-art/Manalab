@@ -45,7 +45,7 @@ const EffortBridge = {
       timeLimitSec = CONFIG.OVERCHARGE_QUIZ_SEC;
       title = '⚡ SURCHARGE : Stop ou Encore !';
     } else {
-      question = ExerciseGenerators[difficulty] ? ExerciseGenerators[difficulty]() : ExerciseGenerators.easy();
+      question = ExerciseGenerators[difficulty] ? ExerciseGenerators[difficulty](state.questionHistory) : ExerciseGenerators.easy(state.questionHistory);
       const labels = { easy: 'Facile (Mana Brut)', medium: 'Moyen (Mana Pur)', hard: 'Difficile (Mana Prismatique)' };
       title = `🧪 Extraction de Mana — ${labels[difficulty] || ''}`;
     }

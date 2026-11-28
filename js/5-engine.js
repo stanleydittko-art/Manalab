@@ -349,7 +349,7 @@ const GameEngine = {
     this.emit('fx', { kind: 'burst', rarity, chromatic });
     this.emit('stateChanged', { areas: ['incubator', 'enclosures', 'fusion', 'manadex', 'hud', 'nav'] });
 
-    return { specimen, speciesDef, rarity, chromatic, isNewDiscovery, autoPlacedEnc };
+    return { specimen, speciesDef, rarity, chromatic, isNewDiscovery, autoPlacedEnc, chance: odds[rarity], pityTriggered: !!odds.pityTriggered };
   },
 
   // --- Exercices & Récompenses Mana ---
@@ -361,6 +361,13 @@ const GameEngine = {
       if (state.streak > state.bestStreak) state.bestStreak = state.streak;
     } else {
       state.streak = 0;
+    }
+
+    // Bilan par catégorie (calcul / pourcentage / proba) pour l'enseignant
+    if (question.cat) {
+      const c = state.catStats[question.cat] || (state.catStats[question.cat] = { ok: 0, total: 0 });
+      c.total++;
+      if (isCorrect) c.ok++;
     }
 
     // Enregistrer dans l'historique de répétition espacée
@@ -460,71 +467,6 @@ const GameEngine = {
   },
 
   // --- Gardien Alpha ---
-  // --- Progression par paliers (ZÉRO DOM : renvoie des données / émet des événements) ---
-  checkUnlocks() {
-    const P = CONFIG.PROGRESSION;
-    const conds = {
-      enclosures: () => state.stats.eggsHatched >= P.enclosures.eggsHatched,
-      producer: () => state.stats.eggsHatched >= P.producer.eggsHatched,
-      manadex: () => this.getDiscoveredCount() >= P.manadex.species,
-      fusion: () => this.getFusableGroups().length > 0,
-      guardian: () => this.canChallengeGuardian() || state.shards >= CONFIG.GUARDIAN_SHARD_BYPASS
-    };
-    const newly = [];
-    for (const key of Object.keys(conds)) {
-      if (!state.unlocked[key] && conds[key]()) {
-        state.unlocked[key] = true;
-        newly.push(key);
-        this.emit('toast', { text: `🔓 Débloqué : ${P[key].label} !`, tone: 'gold' });
-      }
-    }
-    if (newly.length > 0) {
-      AudioFX.play('correct');
-      this.emit('stateChanged', { areas: ['hud', 'nav', 'enclosures', 'fusion', 'manadex', 'incubator'] });
-    }
-    return newly;
-  },
-
-  unlockAll() {
-    for (const key of Object.keys(state.unlocked)) state.unlocked[key] = true;
-    state.teacherMode = true;
-    this.emit('stateChanged', { areas: ['hud', 'nav', 'enclosures', 'fusion', 'manadex', 'incubator', 'exercises'] });
-  },
-
-  // Objectif unique affiché à l'élève (« Mission du moment ») ; null si tout est accompli
-  getMission() {
-    const P = CONFIG.PROGRESSION;
-    const hatched = state.stats.eggsHatched;
-    const discovered = this.getDiscoveredCount();
-    const eggs = state.incubators.filter(i => i.unlocked && i.egg);
-    const totalMana = state.mana.raw + state.mana.pure + state.mana.prismatic;
-    if (eggs.some(i => i.egg.remainingSec <= 0)) {
-      return { text: 'Ton œuf est prêt ! Ouvre-le.', tab: 'incubator' };
-    }
-    if (hatched < 1) {
-      if (eggs.length > 0) return { text: 'Ton œuf incube… patiente quelques secondes.', tab: 'incubator' };
-      if (totalMana < 1) return { text: 'Réponds à une question facile pour gagner du Mana.', tab: 'exercises' };
-      return { text: 'Utilise ton Mana pour lancer ton premier œuf.', tab: 'incubator' };
-    }
-    if (hatched < P.producer.eggsHatched) {
-      const needMana = totalMana < 1 && eggs.length === 0;
-      return {
-        text: needMana
-          ? `Plus de Mana ? Réponds à une question (œufs : ${hatched}/${P.producer.eggsHatched}).`
-          : `Fais éclore ${P.producer.eggsHatched} œufs (${hatched}/${P.producer.eggsHatched}).`,
-        tab: needMana ? 'exercises' : 'incubator'
-      };
-    }
-    if (discovered < P.manadex.species) {
-      return { text: `Découvre ${P.manadex.species} espèces différentes (${discovered}/${P.manadex.species}).`, tab: 'incubator' };
-    }
-    if (!state.guardianDefeated && discovered < CONFIG.GUARDIAN_SPECIES_REQ) {
-      return { text: `Découvre ${CONFIG.GUARDIAN_SPECIES_REQ} espèces pour défier le Gardien Alpha (${discovered}/${CONFIG.GUARDIAN_SPECIES_REQ}).`, tab: 'incubator' };
-    }
-    if (!state.guardianDefeated) return { text: 'Affronte le Gardien Alpha !', tab: 'guardian' };
-    return null;
-  },
-
   canChallengeGuardian() {
     return this.getDiscoveredCount() >= CONFIG.GUARDIAN_SPECIES_REQ || state.guardianUnlockedByShards;
   },
@@ -559,6 +501,7 @@ const GameEngine = {
   // --- Boucle logique 1 seconde ---
   tick(dtSec) {
     this.checkUnlocks();
+    this.checkAchievements();
 
     // 1. Production d'Éclats
     const prod = this.getTotalProductionPerSec();

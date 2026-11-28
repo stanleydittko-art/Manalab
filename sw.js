@@ -1,6 +1,6 @@
 /* Service Worker ManaLab — cache hors-ligne complet.
    RÈGLE : incrémenter CACHE_NAME à chaque ajout/suppression/modification notable de fichier. */
-const CACHE_NAME = 'manalab-cache-v4';
+const CACHE_NAME = 'manalab-cache-v5';
 const FILES = [
   "./",
   "index.html",
@@ -12,15 +12,19 @@ const FILES = [
   "icons/icon-512.png",
   "js/1-config.js",
   "js/2-data.js",
+  "js/2-exercises.js",
+  "js/2-tips.js",
   "js/3-state.js",
   "js/4-utils.js",
   "js/5-engine.js",
+  "js/5-engine-progress.js",
   "js/6-bridge.js",
   "js/7-fx.js",
   "js/8-ui.js",
   "js/8-ui-tabs.js",
   "js/8-ui-modals.js",
   "js/8-ui-progress.js",
+  "js/8-ui-settings.js",
   "js/8-ui-events.js",
   "js/9-main.js"
 ];

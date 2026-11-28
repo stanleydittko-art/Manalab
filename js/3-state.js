@@ -19,6 +19,11 @@ function createDefaultState() {
     // Progression par paliers (voir CONFIG.PROGRESSION) & mode enseignant
     unlocked: { enclosures: false, producer: false, manadex: false, fusion: false, guardian: false },
     teacherMode: false,
+    seenTips: {},
+    achievements: {},
+    catStats: {},   // bilan par catégorie : { calcul: { ok, total }, pourcentage: {...}, proba: {...} }
+    settings: { bigFont: false, contrast: false },
+    grade: 4,       // niveau de classe des exercices (1=6e … 4=3e / tous), réglé par l'enseignant
 
     // Enclos : 1 débloqué au départ contenant déjà le 1er Tupa Corail
     enclosures: [
@@ -103,6 +108,10 @@ const Storage = {
       manaSelection: { ...def.manaSelection, ...(saved.manaSelection || {}) },
       stats: { ...def.stats, ...(saved.stats || {}) },
       unlocked: { ...def.unlocked, ...(saved.unlocked || {}) },
+      seenTips: { ...(saved.seenTips || {}) },
+      achievements: { ...(saved.achievements || {}) },
+      catStats: { ...(saved.catStats || {}) },
+      settings: { ...def.settings, ...(saved.settings || {}) },
       version: CONFIG.SAVE_VERSION
     };
     // Parties créées avant la progression par paliers : tout reste débloqué

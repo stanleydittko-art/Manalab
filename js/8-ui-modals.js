@@ -41,6 +41,7 @@ Object.assign(UI, {
         : `❌ <strong>${timedOut ? 'Temps écoulé !' : 'Raté !'}</strong> ${question.explain}`;
 
       AudioFX.play(isCorrect ? 'correct' : 'wrong');
+      if (!isCorrect) { try { navigator.vibrate && navigator.vibrate(120); } catch (e) {} }
 
       setTimeout(() => {
         this.closeModal();
@@ -149,7 +150,15 @@ Object.assign(UI, {
 
   // --- MODALE DE RÉVÉLATION DE SPÉCIMEN (Éclosion ou Fusion) ---
   showSpecimenRevealModal(res, headerText) {
-    const { speciesDef, rarity, chromatic, isNewDiscovery, autoPlacedEnc } = res;
+    const { speciesDef, rarity, chromatic, isNewDiscovery, autoPlacedEnc, chance } = res;
+    let whyHtml = '';
+    if (typeof chance === 'number') {
+      const verdict = res.pityTriggered ? 'la jauge de chance garantie a joué !'
+        : chance >= 50 ? 'c’était le résultat le plus probable.'
+        : chance <= 10 ? 'quelle chance, c’était peu probable !'
+        : 'c’était possible.';
+      whyHtml = `<div class="why-box">🎲 Tu avais <strong>${chance} %</strong> de chances d’obtenir « ${CONFIG.RARITY_LABELS[rarity]} » : ${verdict}</div>`;
+    }
     this.openModal(`
       <div style="text-align:center;">
         <div style="font-size:0.84rem;font-weight:800;color:var(--accent-cyan);margin-bottom:6px;">${headerText}</div>
@@ -162,6 +171,7 @@ Object.assign(UI, {
           ${chromatic ? '<span class="chromatic-badge">🌈 CHROMATIQUE ×3 !</span>' : ''}
         </div>
         <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:10px;">${speciesDef.desc}</p>
+        ${whyHtml}
         <div style="font-size:0.95rem;font-weight:800;color:#2ef2e0;margin-bottom:14px;">
           Production : +${speciesDef.prod * (chromatic ? 3 : 1)} Éclats/s
         </div>
