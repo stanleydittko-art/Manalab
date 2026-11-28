@@ -46,12 +46,19 @@ const CONFIG = {
   INCUBATOR_COSTS: [0, 320, 1100],
   LAB_BOOST_COSTS: [200, 650, 1800, 4200],
   GUARDIAN_SPECIES_REQ: 5,
-  GUARDIAN_SHARD_BYPASS: 1500,
+  // Maîtrise requise pour défier le Gardien (plus de passage payant)
+  GUARDIAN_MASTERY: { window: 20, minAccuracy: 0.7, minHard: 3 },
 
   // Fusion Risquée
   FUSION_SAFE_COUNT: 3,
   FUSION_RISKY_COUNT: 2,
   FUSION_RISKY_CHANCE: 0.65,
+
+  // Réservoir d'Éclats : la production remplit un réservoir plafonné, à vider avec un flash-quiz
+  RESERVOIR_CAP_SEC: 600,        // capacité = 10 minutes de production
+  RESERVOIR_ALERT_RATIO: 0.8,    // alerte « réservoir presque plein » à 80 %
+  COLLECT_STREAK_BONUS: 0.05,    // +5 % de gain par bonne réponse d'affilée...
+  COLLECT_STREAK_MAX: 10,        // ... jusqu'à +50 %
 
   // Mode enseignant : code de déblocage de toutes les fonctionnalités
   TEACHER_CODE: 'secret',

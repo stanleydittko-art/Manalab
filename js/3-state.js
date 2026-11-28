@@ -6,6 +6,7 @@ function createDefaultState() {
   return {
     version: CONFIG.SAVE_VERSION,
     shards: 30,
+    reservoir: 0,   // Éclats produits en attente de récolte (voir CONFIG.RESERVOIR_CAP_SEC)
     totalShardsEarned: 30,
     mana: { raw: 2, pure: 0, prismatic: 0 },
     streak: 0,
@@ -56,6 +57,7 @@ function createDefaultState() {
 
     // Historique des questions vues pour la répétition espacée
     questionHistory: [],
+    recentAnswers: [], // 20 dernières réponses { ok, d } pour la maîtrise du Gardien
     stats: { exercisesWon: 0, exercisesTotal: 0, eggsHatched: 0, fusionsWon: 0 },
 
     instabilityTimer: CONFIG.INSTABILITY_INTERVAL_SEC,
@@ -108,6 +110,7 @@ const Storage = {
       manaSelection: { ...def.manaSelection, ...(saved.manaSelection || {}) },
       stats: { ...def.stats, ...(saved.stats || {}) },
       unlocked: { ...def.unlocked, ...(saved.unlocked || {}) },
+      reservoir: Number.isFinite(saved.reservoir) ? Math.max(0, saved.reservoir) : 0,
       seenTips: { ...(saved.seenTips || {}) },
       achievements: { ...(saved.achievements || {}) },
       catStats: { ...(saved.catStats || {}) },
@@ -123,6 +126,7 @@ const Storage = {
     if (!merged.specimens || typeof merged.specimens !== 'object') merged.specimens = def.specimens;
     if (!merged.manadex || typeof merged.manadex !== 'object') merged.manadex = def.manadex;
     if (!Array.isArray(merged.questionHistory)) merged.questionHistory = [];
+    if (!Array.isArray(merged.recentAnswers)) merged.recentAnswers = [];
     return merged;
   },
 
@@ -152,11 +156,13 @@ const Storage = {
       if (enc.unstable) encBase *= CONFIG.INSTABILITY_PENALTY;
       rate += encBase * boostMult;
     }
-    const gained = Math.floor(rate * cappedSec);
+    // La production hors-ligne remplit le réservoir (plafonné) : il faudra le récolter avec un flash-quiz
+    const cap = rate * CONFIG.RESERVOIR_CAP_SEC;
+    const before = state.reservoir;
+    state.reservoir = Math.min(cap, state.reservoir + rate * cappedSec);
+    const gained = Math.max(0, Math.floor(state.reservoir - before));
     if (gained <= 0 && eggsReady === 0) return null;
-    state.shards += gained;
-    state.totalShardsEarned += gained;
-    return { elapsedSec: cappedSec, gained, eggsReady };
+    return { elapsedSec: cappedSec, gained, eggsReady, full: state.reservoir >= cap };
   },
 
   reset() {

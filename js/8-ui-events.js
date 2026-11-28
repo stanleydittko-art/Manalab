@@ -133,6 +133,20 @@ Object.assign(UI, {
           this.openHatchModal(Number(el.dataset.inc));
           break;
 
+        case 'collect': {
+          if (GameEngine.getCollectGain() <= 0) break;
+          EffortBridge.requestAction(
+            'COLLECT',
+            'flash',
+            () => {
+              const gain = GameEngine.collectReservoir();
+              this.showToast(`💎 +${Utils.formatNum(gain)} Éclats récoltés !`, 'gold');
+            },
+            () => this.showToast('Récolte ratée : ton réservoir est intact, réessaie !', 'danger')
+          );
+          break;
+        }
+
         case 'show-tip':
           AudioFX.play('click');
           this.showTip(el.dataset.tip);

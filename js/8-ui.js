@@ -57,6 +57,8 @@ const UI = {
     document.getElementById('hud-shards').textContent = Utils.formatNum(state.shards);
     document.getElementById('hud-prod-rate').textContent = `+${prod.toFixed(1).replace(/\.0$/, '')}/s`;
 
+    if (this.activeTab === 'enclosures') this.updateReservoirDisplay();
+
     // Mettre à jour les barres de progression d'incubation en place
     if (this.activeTab === 'incubator') {
       for (const inc of state.incubators) {
@@ -109,8 +111,9 @@ const UI = {
   renderNavBadges() {
     const unstableCount = state.enclosures.filter(e => e.unlocked && e.unstable).length;
     const bEnc = document.getElementById('badge-enclosures');
-    bEnc.style.display = unstableCount > 0 ? 'grid' : 'none';
-    bEnc.textContent = unstableCount;
+    const resAlert = state.unlocked.enclosures && GameEngine.isReservoirAlert();
+    bEnc.style.display = (unstableCount > 0 || resAlert) ? 'grid' : 'none';
+    bEnc.textContent = unstableCount > 0 ? unstableCount : '💎';
 
     const readyEggs = state.incubators.filter(i => i.unlocked && i.egg && i.egg.remainingSec <= 0).length;
     const bInc = document.getElementById('badge-incubator');

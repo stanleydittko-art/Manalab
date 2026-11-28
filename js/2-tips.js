@@ -29,7 +29,11 @@ const TIPS = {
   },
   enclosures: {
     title: '🏝️ Les enclos',
-    text: 'Place tes créatures dans un enclos : elles produisent des Éclats en continu. Deux types différents dans le même enclos donnent un bonus de synergie.'
+    text: 'Place tes créatures dans un enclos : elles remplissent ton réservoir d’Éclats. Deux types différents dans le même enclos donnent un bonus de synergie.'
+  },
+  reservoir: {
+    title: '💎 Le réservoir d’Éclats',
+    text: 'Tes créatures remplissent le réservoir, même quand tu es absent, mais il est limité à 10 minutes de production. Pour récupérer les Éclats, réponds à un flash-quiz : plus ta série de bonnes réponses est longue, plus tu gagnes (jusqu’à +50 %). Si tu te trompes, rien n’est perdu : tu peux réessayer.'
   },
   instability: {
     title: '🧬 ADN instable',
@@ -45,7 +49,7 @@ const TIPS = {
   },
   guardian: {
     title: '👑 Le Gardien Alpha',
-    text: 'Le dernier défi : une série de questions chronométrées. Réponds juste pour devenir Maître du lagon.'
+    text: 'Le dernier défi : 3 questions chronométrées. Pour y accéder, il faut 5 espèces, 70 % de réussite sur tes 20 dernières réponses et 3 questions Difficiles réussies. Il se mérite : on ne peut pas l’acheter !'
   }
 };
 

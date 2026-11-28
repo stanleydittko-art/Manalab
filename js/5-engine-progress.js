@@ -12,7 +12,7 @@ Object.assign(GameEngine, {
       producer: () => state.stats.eggsHatched >= P.producer.eggsHatched,
       manadex: () => this.getDiscoveredCount() >= P.manadex.species,
       fusion: () => this.getFusableGroups().length > 0,
-      guardian: () => this.canChallengeGuardian() || state.shards >= CONFIG.GUARDIAN_SHARD_BYPASS
+      guardian: () => this.getDiscoveredCount() >= CONFIG.GUARDIAN_SPECIES_REQ
     };
     const newly = [];
     for (const key of Object.keys(conds)) {
@@ -42,6 +42,38 @@ Object.assign(GameEngine, {
   // Dosage automatique pour le mode simplifié de l'incubateur (1 dose de Mana Brut)
   setAutoDose() {
     state.manaSelection = { raw: Math.min(1, state.mana.raw), pure: 0, prismatic: 0 };
+  },
+
+  // --- Réservoir d'Éclats ---
+  getReservoirCap() {
+    return Math.max(0, this.getTotalProductionPerSec() * CONFIG.RESERVOIR_CAP_SEC);
+  },
+
+  getReservoirRatio() {
+    const cap = this.getReservoirCap();
+    return cap > 0 ? Math.min(1, state.reservoir / cap) : 0;
+  },
+
+  isReservoirAlert() {
+    return state.reservoir >= 1 && this.getReservoirRatio() >= CONFIG.RESERVOIR_ALERT_RATIO;
+  },
+
+  // Gain d'une récolte réussie : réservoir × (1 + bonus de série)
+  getCollectGain() {
+    const bonus = Math.min(state.streak, CONFIG.COLLECT_STREAK_MAX) * CONFIG.COLLECT_STREAK_BONUS;
+    return Math.floor(state.reservoir * (1 + bonus));
+  },
+
+  // À appeler uniquement après une réponse juste (via EffortBridge 'COLLECT')
+  collectReservoir() {
+    const gain = this.getCollectGain();
+    if (gain <= 0) return 0;
+    state.reservoir = 0;
+    state.shards += gain;
+    state.totalShardsEarned += gain;
+    this.emit('fx', { kind: 'floatText', text: `+${gain} ✦` });
+    this.emit('stateChanged', { areas: ['hud', 'nav', 'enclosures'] });
+    return gain;
   },
 
   // --- Succès ---
@@ -94,6 +126,9 @@ Object.assign(GameEngine, {
     if (eggs.some(i => i.egg.remainingSec <= 0)) {
       return { text: 'Ton œuf est prêt ! Ouvre-le.', tab: 'incubator' };
     }
+    if (state.unlocked.enclosures && this.isReservoirAlert()) {
+      return { text: 'Ton réservoir d’Éclats est presque plein : récolte-le !', tab: 'enclosures' };
+    }
     if (hatched < 1) {
       if (eggs.length > 0) return { text: 'Ton œuf incube… patiente quelques secondes.', tab: 'incubator' };
       if (totalMana < 1) return { text: 'Réponds à une question facile pour gagner du Mana.', tab: 'exercises' };
@@ -114,7 +149,18 @@ Object.assign(GameEngine, {
     if (!state.guardianDefeated && discovered < CONFIG.GUARDIAN_SPECIES_REQ) {
       return { text: `Découvre ${CONFIG.GUARDIAN_SPECIES_REQ} espèces pour défier le Gardien Alpha (${discovered}/${CONFIG.GUARDIAN_SPECIES_REQ}).`, tab: 'incubator' };
     }
-    if (!state.guardianDefeated) return { text: 'Affronte le Gardien Alpha !', tab: 'guardian' };
+    if (!state.guardianDefeated) {
+      const req = this.getGuardianRequirements();
+      if (!req.ok) {
+        const text = req.answers.have < req.answers.need
+          ? `Prépare le Gardien : réponds à ${req.answers.need} questions (${req.answers.have}/${req.answers.need}).`
+          : req.hard.have < req.hard.need
+            ? `Prépare le Gardien : réussis ${req.hard.need} questions Difficiles récentes (${req.hard.have}/${req.hard.need}).`
+            : `Prépare le Gardien : atteins ${req.accuracy.need} % de réussite (${req.accuracy.have} %).`;
+        return { text, tab: 'exercises' };
+      }
+      return { text: 'Affronte le Gardien Alpha !', tab: 'guardian' };
+    }
     return null;
   },
 });

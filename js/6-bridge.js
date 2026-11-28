@@ -12,7 +12,7 @@ const EffortBridge = {
   },
 
   /**
-   * @param {string} actionType - 'EARN_MANA' | 'STABILIZE' | 'ACCELERATE' | 'OVERCHARGE'
+   * @param {string} actionType - 'EARN_MANA' | 'STABILIZE' | 'ACCELERATE' | 'OVERCHARGE' | 'COLLECT'
    * @param {string} difficulty - 'easy' | 'medium' | 'hard' | 'flash'
    * @param {Function} onSuccess
    * @param {Function} onFail
@@ -34,11 +34,11 @@ const EffortBridge = {
     let timeLimitSec = null;
     let title = 'Défi ManaLab';
 
-    if (difficulty === 'flash' || actionType === 'STABILIZE' || actionType === 'ACCELERATE') {
+    if (difficulty === 'flash' || actionType === 'STABILIZE' || actionType === 'ACCELERATE' || actionType === 'COLLECT') {
       question = ExerciseGenerators.flashcard(state.questionHistory);
       timeLimitSec = CONFIG.FLASH_QUIZ_SEC;
-      title = actionType === 'STABILIZE'
-        ? '🧬 Stabilisation ADN (Flash-Quiz Mémoire)'
+      title = actionType === 'STABILIZE' ? '🧬 Stabilisation ADN (Flash-Quiz Mémoire)'
+        : actionType === 'COLLECT' ? '💎 Récolte des Éclats (Flash-Quiz)'
         : '⚡ Accélération d’Incubation (Flash-Quiz)';
     } else if (actionType === 'OVERCHARGE') {
       question = Math.random() < 0.5 ? ExerciseGenerators.medium() : ExerciseGenerators.hard();

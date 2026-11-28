@@ -95,6 +95,7 @@ Object.assign(UI, {
           </div>
           <button class="btn btn-sm btn-ghost" data-action="goto-tab" data-target="exercises">⚡ Gagner du Mana</button>
         </div>
+        ${this.reservoirHtml()}
         <div class="enclosures-grid">${enclosuresHtml}</div>
         <div class="upgrades-row">
           ${nextLockedEnc ? `

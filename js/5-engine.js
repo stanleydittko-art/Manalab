@@ -363,6 +363,10 @@ const GameEngine = {
       state.streak = 0;
     }
 
+    // Fenêtre glissante des dernières réponses (maîtrise requise pour le Gardien)
+    state.recentAnswers.push({ ok: !!isCorrect, d: question.difficulty || 'easy' });
+    while (state.recentAnswers.length > CONFIG.GUARDIAN_MASTERY.window) state.recentAnswers.shift();
+
     // Bilan par catégorie (calcul / pourcentage / proba) pour l'enseignant
     if (question.cat) {
       const c = state.catStats[question.cat] || (state.catStats[question.cat] = { ok: 0, total: 0 });
@@ -467,17 +471,24 @@ const GameEngine = {
   },
 
   // --- Gardien Alpha ---
-  canChallengeGuardian() {
-    return this.getDiscoveredCount() >= CONFIG.GUARDIAN_SPECIES_REQ || state.guardianUnlockedByShards;
+  // Conditions du Gardien : espèces découvertes ET maîtrise sur les dernières réponses
+  getGuardianRequirements() {
+    const M = CONFIG.GUARDIAN_MASTERY;
+    const recent = state.recentAnswers;
+    const okCount = recent.filter(a => a.ok).length;
+    const hardOk = recent.filter(a => a.ok && a.d === 'hard').length;
+    const accuracy = recent.length > 0 ? Math.round((okCount / recent.length) * 100) : 0;
+    const species = { have: this.getDiscoveredCount(), need: CONFIG.GUARDIAN_SPECIES_REQ };
+    const answers = { have: recent.length, need: M.window };
+    const acc = { have: accuracy, need: Math.round(M.minAccuracy * 100) };
+    const hard = { have: hardOk, need: M.minHard };
+    const ok = species.have >= species.need && answers.have >= answers.need
+      && acc.have >= acc.need && hard.have >= hard.need;
+    return { species, answers, accuracy: acc, hard, ok };
   },
 
-  unlockGuardianWithShards() {
-    if (state.shards < CONFIG.GUARDIAN_SHARD_BYPASS) return false;
-    state.shards -= CONFIG.GUARDIAN_SHARD_BYPASS;
-    state.guardianUnlockedByShards = true;
-    AudioFX.play('correct');
-    this.emit('stateChanged', { areas: ['hud', 'nav'] });
-    return true;
+  canChallengeGuardian() {
+    return this.getGuardianRequirements().ok;
   },
 
   grantGuardianVictory() {
@@ -506,9 +517,13 @@ const GameEngine = {
     // 1. Production d'Éclats
     const prod = this.getTotalProductionPerSec();
     if (prod > 0) {
-      const gained = prod * dtSec;
-      state.shards += gained;
-      state.totalShardsEarned += gained;
+      const cap = this.getReservoirCap();
+      const wasAlert = this.isReservoirAlert();
+      state.reservoir = Math.min(cap, state.reservoir + prod * dtSec);
+      if (!wasAlert && this.isReservoirAlert()) {
+        this.emit('toast', { text: '💎 Ton réservoir d’Éclats est presque plein : récolte-le !', tone: 'gold' });
+        this.emit('stateChanged', { areas: ['nav', 'hud'] });
+      }
     }
 
     // 2. Décompte des incubateurs

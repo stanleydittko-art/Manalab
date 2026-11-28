@@ -96,5 +96,42 @@ check('Succès « Premier œuf »', T.state().achievements.first_hatch === true)
 eng.unlockAll();
 check('unlockAll débloque tout', Object.values(T.state().unlocked).every(Boolean));
 
+// --- 7. Réservoir d'Éclats ---
+{
+  const st = T.state();
+  st.reservoir = 0;
+  const prodNow = eng.getTotalProductionPerSec();
+  check('Production > 0 pour tester le réservoir', prodNow > 0);
+  const shardsBefore = st.shards;
+  for (let i = 0; i < 5000; i++) eng.tick(1);
+  check('Le réservoir est plafonné (10 min de production)', st.reservoir <= eng.getReservoirCap() + 1e-6 && st.reservoir > 0);
+  check('La production passive ne crédite plus les Éclats directement', st.shards === shardsBefore);
+  st.streak = 4;
+  const expected = Math.floor(st.reservoir * 1.2);
+  const gain = eng.collectReservoir();
+  check('Récolte = réservoir × (1 + 5 % × série)', gain === expected && st.reservoir === 0 && st.shards === shardsBefore + gain, `${gain} vs ${expected}`);
+  const off = T.Storage.migrate({ shards: 5 });
+  check('Ancienne sauvegarde : réservoir à 0', off.reservoir === 0);
+}
+
+// --- 8. Gardien : plus de passage payant, maîtrise requise ---
+{
+  const st = T.state();
+  st.shards = 999999;
+  check('Le Gardien ne s\'achète pas', typeof eng.unlockGuardianWithShards === 'undefined' && T.CONFIG.GUARDIAN_SHARD_BYPASS === undefined);
+  for (const sp of T.SPECIES_LIST) st.manadex[sp.id] = { discovered: true, chromatic: false, count: 1 };
+  st.recentAnswers = [];
+  check('Gardien fermé sans réponses récentes', eng.canChallengeGuardian() === false);
+  const fill = (n, okN, hardOkN) => { st.recentAnswers = []; for (let i = 0; i < n; i++) st.recentAnswers.push({ ok: i < okN, d: i < hardOkN ? 'hard' : 'easy' }); };
+  fill(20, 20, 0);
+  check('Gardien fermé sans question Difficile', eng.canChallengeGuardian() === false);
+  fill(20, 13, 3);
+  check('Gardien fermé sous 70 % de réussite', eng.canChallengeGuardian() === false);
+  fill(20, 14, 3);
+  check('Gardien ouvert : 5 espèces, 70 %, 3 Difficiles', eng.canChallengeGuardian() === true);
+  fill(19, 19, 3);
+  check('Gardien fermé : moins de 20 réponses', eng.canChallengeGuardian() === false);
+}
+
 console.log(failures === 0 ? '\nTous les tests passent.' : `\n${failures} test(s) en échec.`);
 process.exit(failures === 0 ? 0 : 1);

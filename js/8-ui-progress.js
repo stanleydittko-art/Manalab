@@ -62,6 +62,35 @@ Object.assign(UI, {
     else this.switchTab(tabName);
   },
 
+  // --- Réservoir d'Éclats (affiché en haut de l'onglet Enclos) ---
+  reservoirHtml() {
+    const cap = GameEngine.getReservoirCap();
+    const pct = Math.round(GameEngine.getReservoirRatio() * 100);
+    const gain = GameEngine.getCollectGain();
+    return `
+      <div class="reservoir-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <strong>💎 Réservoir d'Éclats ${this.tipBtn('reservoir')}</strong>
+          <span data-res-txt style="font-size:0.84rem;">${Utils.formatNum(Math.floor(state.reservoir))} / ${Utils.formatNum(Math.floor(cap))} ✦</span>
+        </div>
+        <div class="progress-track"><div data-res-bar class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,#14b8a6,#facc15);"></div></div>
+        <button class="btn btn-gold" data-action="collect" ${gain > 0 ? '' : 'disabled'}>💎 Récolter (flash-quiz) <span data-res-gain>+${Utils.formatNum(gain)}</span> ✦</button>
+      </div>`;
+  },
+
+  // Mise à jour légère (1 Hz) du réservoir, sans redessiner l'onglet
+  updateReservoirDisplay() {
+    const txt = document.querySelector('[data-res-txt]');
+    if (!txt) return;
+    const cap = GameEngine.getReservoirCap();
+    txt.textContent = `${Utils.formatNum(Math.floor(state.reservoir))} / ${Utils.formatNum(Math.floor(cap))} ✦`;
+    document.querySelector('[data-res-bar]').style.width = `${Math.round(GameEngine.getReservoirRatio() * 100)}%`;
+    const gainEl = document.querySelector('[data-res-gain]');
+    if (gainEl) gainEl.textContent = `+${Utils.formatNum(GameEngine.getCollectGain())}`;
+    const btn = document.querySelector('[data-action="collect"]');
+    if (btn) btn.disabled = GameEngine.getCollectGain() <= 0;
+  },
+
   // --- Aides contextuelles (bouton ❓) ---
   tipBtn(key) {
     return `<button class="tip-btn" data-action="show-tip" data-tip="${key}" aria-label="Aide">❓</button>`;

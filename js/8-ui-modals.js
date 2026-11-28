@@ -240,8 +240,8 @@ Object.assign(UI, {
 
   // --- MODALE DU GARDIEN ALPHA (OBJECTIF FINAL DU BIOME 1) ---
   openGuardianModal() {
-    const discovered = GameEngine.getDiscoveredCount();
-    const canFight = GameEngine.canChallengeGuardian();
+    const req = GameEngine.getGuardianRequirements();
+    const canFight = req.ok;
 
     this.openModal(`
       <div style="text-align:center;">
@@ -255,24 +255,21 @@ Object.assign(UI, {
         ${canFight ? `
           <button id="btn-start-guardian" class="btn btn-lg btn-gold" style="width:100%;margin-bottom:8px;">⚔️ Affronter le Gardien Alpha (3 manches)</button>
         ` : `
-          <div style="padding:12px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05);margin-bottom:12px;font-size:0.84rem;">
-            Condition de déblocage : <strong>${discovered} / ${CONFIG.GUARDIAN_SPECIES_REQ} espèces découvertes</strong> au ManaDex
+          <div style="padding:12px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05);margin-bottom:12px;font-size:0.86rem;text-align:left;">
+            <div style="font-weight:800;margin-bottom:6px;">Pour défier le Gardien :</div>
+            ${[
+              [req.species.have >= req.species.need, `${req.species.have} / ${req.species.need} espèces découvertes`],
+              [req.answers.have >= req.answers.need, `${req.answers.have} / ${req.answers.need} dernières réponses données`],
+              [req.accuracy.have >= req.accuracy.need && req.answers.have >= req.answers.need, `Réussite récente : ${req.accuracy.have} % (objectif ${req.accuracy.need} %)`],
+              [req.hard.have >= req.hard.need, `${req.hard.have} / ${req.hard.need} questions Difficiles réussies récemment`]
+            ].map(([done, label]) => `<div style="margin:3px 0;">${done ? '✅' : '⬜'} ${label}</div>`).join('')}
           </div>
-          <button id="btn-unlock-guardian-shards" class="btn btn-purple" style="width:100%;margin-bottom:8px;" ${state.shards >= CONFIG.GUARDIAN_SHARD_BYPASS ? '' : 'disabled'}>
-            🔓 Forcer le portail avec ${Utils.formatNum(CONFIG.GUARDIAN_SHARD_BYPASS)} Éclats ✦
-          </button>
         `}
         <button id="btn-guardian-close" class="btn btn-sm btn-ghost">Fermer</button>
       </div>
     `);
 
     document.getElementById('btn-guardian-close').addEventListener('click', () => this.closeModal());
-    const unlockBtn = document.getElementById('btn-unlock-guardian-shards');
-    if (unlockBtn) {
-      unlockBtn.addEventListener('click', () => {
-        if (GameEngine.unlockGuardianWithShards()) this.openGuardianModal();
-      });
-    }
     const fightBtn = document.getElementById('btn-start-guardian');
     if (fightBtn) {
       fightBtn.addEventListener('click', () => this.runGuardianRound(1));
@@ -399,13 +396,14 @@ Object.assign(UI, {
         <span class="biome-pill">Bon retour au labo !</span>
         <h2 style="margin:8px 0;">⏳ Gains hors-ligne</h2>
         <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:12px;">
-          Pendant ton absence (<strong>${Utils.formatDuration(report.elapsedSec)}</strong>), tes enclos ont continué à tourner :
+          Pendant ton absence (<strong>${Utils.formatDuration(report.elapsedSec)}</strong>), tes enclos ont continué à produire :
         </p>
         <div style="font-size:1.35rem;font-weight:800;color:#2ef2e0;margin-bottom:10px;">
-          +${Utils.formatNum(report.gained)} Éclats d'Énergie ✦
+          +${Utils.formatNum(report.gained)} Éclats dans ton réservoir ✦
         </div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px;">${report.full ? 'Réservoir plein ! ' : ''}Va dans l’onglet Enclos et réponds à un flash-quiz pour les récolter.</div>
         ${report.eggsReady > 0 ? `<div style="color:#facc15;font-weight:700;margin-bottom:12px;">🥚 ${report.eggsReady} œuf(s) prêt(s) à éclore !</div>` : ''}
-        <button id="btn-offline-ok" class="btn btn-primary" style="width:100%;">Récupérer</button>
+        <button id="btn-offline-ok" class="btn btn-primary" style="width:100%;">OK</button>
       </div>
     `);
     document.getElementById('btn-offline-ok').addEventListener('click', () => this.closeModal());
