@@ -129,3 +129,6 @@ Réponds toujours en **français**, de façon concise (**5 puces maximum**) :
 * **Code, fichiers, fonctions, variables :** Anglais clair et cohérent (`computeOdds`, `hatchEgg`, `enclosureId`).
 * **Textes visibles du jeu, commentaires métier, échanges :** Français naturel, en respectant l'orthographe et l'esprit des termes polynésiens (*Mana*, *Fenua*, *Tupa*, *Tiare*, *Mo'o*, *Honu*, *Puhi*, *Fai*, *Te Feti'a*, *ManaDex*).
 * **Générateurs d'exercices :** Tous les énoncés et explications pédagogiques doivent être en français clair, mathématiquement exacts (résultats entiers ou pourcentages propres), avec 4 choix distincts sans doublon.
+## Équilibrage
+- Tous les coûts/conditions de maîtrise sont dans `js/1-config.js` (`*_COSTS`, `*_REQ`, `GUARDIAN_MASTERY`, `PRODUCTION_MULT`).
+- Après tout changement d'équilibrage : `node tools/sim.js 260 3` (élève virtuel, 3 questions/min). Cible actuelle : Gardien ≈ 100–130 min.

@@ -49,7 +49,7 @@ const TIPS = {
   },
   guardian: {
     title: '👑 Le Gardien Alpha',
-    text: 'Le dernier défi : 3 questions chronométrées. Pour y accéder, il faut 5 espèces, 70 % de réussite sur tes 20 dernières réponses et 3 questions Difficiles réussies. Il se mérite : on ne peut pas l’acheter !'
+    text: 'Le dernier défi : 3 questions chronométrées. Pour y accéder, il faut 7 espèces, beaucoup de bonnes réponses, 70 % de réussite sur tes 20 dernières réponses et 3 questions Difficiles réussies. Il se mérite : on ne peut pas l’acheter !'
   }
 };
 

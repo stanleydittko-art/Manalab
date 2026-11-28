@@ -44,6 +44,29 @@ Object.assign(GameEngine, {
     state.manaSelection = { raw: Math.min(1, state.mana.raw), pure: 0, prismatic: 0 };
   },
 
+  // --- Maîtrise requise pour débloquer (en plus des Éclats) ---
+  // kind : 'enclosure' | 'incubator' | 'boost' ; renvoie { items:[{label,have,need,done}], met }
+  getUnlockRequirement(kind, idx) {
+    const table = { enclosure: CONFIG.ENCLOSURE_REQ, incubator: CONFIG.INCUBATOR_REQ, boost: CONFIG.LAB_BOOST_REQ }[kind];
+    const req = table && table[idx];
+    const items = [];
+    if (req) {
+      const catLabels = { calcul: 'en calcul mental', pourcentage: 'en pourcentages', proba: 'en probabilités' };
+      if (req.wins) items.push({ label: 'bonnes réponses', have: state.stats.exercisesWon, need: req.wins });
+      for (const [cat, need] of Object.entries(req.cat || {})) {
+        items.push({ label: `bonnes réponses ${catLabels[cat]}`, have: (state.catStats[cat] || { ok: 0 }).ok, need });
+      }
+      if (req.accuracy) {
+        const recent = state.recentAnswers;
+        const have = recent.length >= CONFIG.ACCURACY_MIN_ANSWERS
+          ? Math.round((recent.filter(a => a.ok).length / recent.length) * 100) : 0;
+        items.push({ label: '% de réussite récente', have, need: req.accuracy, unit: ' %' });
+      }
+    }
+    for (const it of items) it.done = it.have >= it.need;
+    return { items, met: state.teacherMode || items.every(it => it.done) };
+  },
+
   // --- Réservoir d'Éclats ---
   getReservoirCap() {
     return Math.max(0, this.getTotalProductionPerSec() * CONFIG.RESERVOIR_CAP_SEC);
@@ -132,6 +155,7 @@ Object.assign(GameEngine, {
     if (hatched < 1) {
       if (eggs.length > 0) return { text: 'Ton œuf incube… patiente quelques secondes.', tab: 'incubator' };
       if (totalMana < 1) return { text: 'Réponds à une question facile pour gagner du Mana.', tab: 'exercises' };
+      if (state.shards < CONFIG.EGG_SHARD_COST) return { text: 'Il te faut des Éclats ✦ pour lancer un œuf : fais un exercice.', tab: 'exercises' };
       return { text: 'Utilise ton Mana pour lancer ton premier œuf.', tab: 'incubator' };
     }
     if (hatched < P.producer.eggsHatched) {
@@ -152,7 +176,9 @@ Object.assign(GameEngine, {
     if (!state.guardianDefeated) {
       const req = this.getGuardianRequirements();
       if (!req.ok) {
-        const text = req.answers.have < req.answers.need
+        const text = req.wins.have < req.wins.need
+          ? `Prépare le Gardien : continue les exercices (${req.wins.have}/${req.wins.need} bonnes réponses).`
+          : req.answers.have < req.answers.need
           ? `Prépare le Gardien : réponds à ${req.answers.need} questions (${req.answers.have}/${req.answers.need}).`
           : req.hard.have < req.hard.need
             ? `Prépare le Gardien : réussis ${req.hard.need} questions Difficiles récentes (${req.hard.have}/${req.hard.need}).`

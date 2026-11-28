@@ -48,6 +48,15 @@ const Utils = {
     return out;
   },
 
+  // Production d'Éclats/s d'une créature (échelle globale incluse) — source unique pour moteur et UI
+  specimenRate(def, chromatic) {
+    return def.prod * (chromatic ? CONFIG.CHROMATIC_PROD_MULT : 1) * CONFIG.PRODUCTION_MULT;
+  },
+
+  formatRate(v) {
+    return (Math.round(v * 10) / 10).toString();
+  },
+
   randomOf(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }

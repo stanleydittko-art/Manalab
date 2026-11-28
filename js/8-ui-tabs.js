@@ -28,7 +28,7 @@ Object.assign(UI, {
             <span class="type-pill">${def.type}</span>
             ${sp.chromatic ? '<span class="chromatic-badge">🌈 ×3</span>' : ''}
           </div>
-          <div style="font-size:0.72rem;color:var(--accent-cyan);font-weight:700;">+${def.prod * (sp.chromatic ? 3 : 1)}/s</div>
+          <div style="font-size:0.72rem;color:var(--accent-cyan);font-weight:700;">+${Utils.formatRate(Utils.specimenRate(def, sp.chromatic))}/s</div>
         </div>`;
       }).join('');
 
@@ -78,7 +78,7 @@ Object.assign(UI, {
                 <span class="type-pill">${def.type}</span>
                 ${sp.chromatic ? '<span class="chromatic-badge">🌈 Chroma</span>' : ''}
               </div>
-              <div style="font-size:0.78rem;color:var(--accent-cyan);font-weight:700;">+${def.prod * (sp.chromatic ? 3 : 1)} Éclats/s</div>
+              <div style="font-size:0.78rem;color:var(--accent-cyan);font-weight:700;">+${Utils.formatRate(Utils.specimenRate(def, sp.chromatic))} Éclats/s</div>
               <button class="btn btn-sm btn-primary" style="width:100%;" data-action="place-auto" data-uid="${sp.uid}" ${hasFreeSlot ? '' : 'disabled'}>
                 ${hasFreeSlot ? '🏝️ Placer en enclos' : 'Enclos pleins'}
               </button>
@@ -99,15 +99,15 @@ Object.assign(UI, {
         <div class="enclosures-grid">${enclosuresHtml}</div>
         <div class="upgrades-row">
           ${nextLockedEnc ? `
-            <button class="btn upgrade-pill-btn" data-action="unlock-enclosure" data-enc="${nextLockedEnc.id}" ${state.shards >= CONFIG.ENCLOSURE_COSTS[nextLockedEnc.id] ? '' : 'disabled'}>
+            <button class="btn upgrade-pill-btn" data-action="unlock-enclosure" data-enc="${nextLockedEnc.id}" ${(state.shards >= CONFIG.ENCLOSURE_COSTS[nextLockedEnc.id] && GameEngine.getUnlockRequirement('enclosure', nextLockedEnc.id).met) ? '' : 'disabled'}>
               <span>🔓 Débloquer ${nextLockedEnc.name} (+3 places)</span>
               <strong>${Utils.formatNum(CONFIG.ENCLOSURE_COSTS[nextLockedEnc.id])} ✦</strong>
-            </button>` : ''}
+            </button>${this.reqHtml('enclosure', nextLockedEnc.id)}` : ''}
           ${nextBoostCost !== undefined ? `
-            <button class="btn upgrade-pill-btn btn-purple" data-action="buy-lab-boost" ${state.shards >= nextBoostCost ? '' : 'disabled'}>
+            <button class="btn upgrade-pill-btn btn-purple" data-action="buy-lab-boost" ${(state.shards >= nextBoostCost && GameEngine.getUnlockRequirement('boost', state.labBoostLevel).met) ? '' : 'disabled'}>
               <span>🔬 Amplificateur Labo Niv.${state.labBoostLevel + 1} (+20% prod. globale)</span>
               <strong>${Utils.formatNum(nextBoostCost)} ✦</strong>
-            </button>` : '<span class="biome-pill">🔬 Amplificateur au niveau MAX (+80%)</span>'}
+            </button>${this.reqHtml('boost', state.labBoostLevel)}` : '<span class="biome-pill">🔬 Amplificateur au niveau MAX (+80%)</span>'}
         </div>
       </div>
 
@@ -232,7 +232,7 @@ Object.assign(UI, {
 
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
           <button class="btn btn-lg btn-primary" data-action="start-incubation" ${(!freeInc || totalSel === 0) ? 'disabled' : ''}>
-            ${simple ? '🥚 Lancer l’œuf' : '🥚 Lancer l’incubation'} (${Math.round(CONFIG.INCUBATION_BASE_SEC + totalSel * CONFIG.INCUBATION_PER_MANA_SEC)}s)
+            ${simple ? '🥚 Lancer l’œuf' : '🥚 Lancer l’incubation'} (${Math.round(CONFIG.INCUBATION_BASE_SEC + totalSel * CONFIG.INCUBATION_PER_MANA_SEC)}s • ${CONFIG.EGG_SHARD_COST} ✦)
           </button>
           ${totalSel === 0 ? `<button class="btn btn-sm btn-ghost" data-action="goto-tab" data-target="exercises">⚡ Faire un exercice pour gagner du Mana</button>` : ''}
         </div>
@@ -245,9 +245,9 @@ Object.assign(UI, {
             <div class="panel-desc">Ouvre l’œuf quand il est prêt. ${state.unlocked.producer ? this.tipBtn('overcharge') : ''}</div>
           </div>
           ${nextLockedInc ? `
-            <button class="btn btn-sm btn-gold" data-action="unlock-incubator" data-inc="${nextLockedInc.id}" ${state.shards >= CONFIG.INCUBATOR_COSTS[nextLockedInc.id] ? '' : 'disabled'}>
+            <button class="btn btn-sm btn-gold" data-action="unlock-incubator" data-inc="${nextLockedInc.id}" ${(state.shards >= CONFIG.INCUBATOR_COSTS[nextLockedInc.id] && GameEngine.getUnlockRequirement('incubator', nextLockedInc.id).met) ? '' : 'disabled'}>
               🔓 Incubateur #${nextLockedInc.id + 1} (${Utils.formatNum(CONFIG.INCUBATOR_COSTS[nextLockedInc.id])} ✦)
-            </button>` : ''}
+            </button>${this.reqHtml('incubator', nextLockedInc.id)}` : ''}
         </div>
         <div class="incubators-list">${podsHtml}</div>
       </div>
@@ -283,7 +283,7 @@ Object.assign(UI, {
               <p style="font-size:0.83rem;color:var(--text-muted);">Calcul mental.</p>
             </div>
             <div style="font-size:0.82rem;color:#a7f3d0;">
-              Récompense : <strong>+1 Mana Brut ●</strong> + 8 ✦
+              Récompense : <strong>+1 Mana Brut ●</strong> + ${CONFIG.SHARD_REWARD.easy} ✦
             </div>
             <button class="btn btn-primary" data-action="start-exercise" data-diff="easy">▶ Lancer (Facile)</button>
           </div>
@@ -295,7 +295,7 @@ Object.assign(UI, {
               <p style="font-size:0.83rem;color:var(--text-muted);">Pourcentages et probabilités simples.</p>
             </div>
             <div style="font-size:0.82rem;color:#bae6fd;">
-              Récompense : <strong>+1 Mana Pur ◆</strong> + 18 ✦
+              Récompense : <strong>+1 Mana Pur ◆</strong> + ${CONFIG.SHARD_REWARD.medium} ✦
             </div>
             ${this.tierButton('medium', 'btn-primary', 'Moyen')}
           </div>
@@ -307,7 +307,7 @@ Object.assign(UI, {
               <p style="font-size:0.83rem;color:var(--text-muted);">Probabilités avancées.</p>
             </div>
             <div style="font-size:0.82rem;color:#f3e8ff;">
-              Récompense : <strong>+1 Mana Prismatique ★</strong> + 35 ✦
+              Récompense : <strong>+1 Mana Prismatique ★</strong> + ${CONFIG.SHARD_REWARD.hard} ✦
             </div>
             ${this.tierButton('hard', 'btn-purple', 'Difficile')}
           </div>
@@ -399,7 +399,7 @@ Object.assign(UI, {
           ${chroma ? '<span class="chromatic-badge">🌈 Chroma</span>' : ''}
         </div>
         <div style="font-size:0.78rem;color:var(--accent-cyan);font-weight:700;">
-          ${found ? `+${def.prod} Éclats/s • Capturés : ${entry.count}` : 'Non découvert'}
+          ${found ? `+${Utils.formatRate(Utils.specimenRate(def, false))} Éclats/s • Capturés : ${entry.count}` : 'Non découvert'}
         </div>
         <p style="font-size:0.76rem;color:var(--text-muted);line-height:1.35;">
           ${found ? def.desc : 'Explore l’incubateur ou la fusion pour révéler ce spécimen.'}

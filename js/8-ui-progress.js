@@ -62,6 +62,14 @@ Object.assign(UI, {
     else this.switchTab(tabName);
   },
 
+  // Liste des conditions de maîtrise d'un déblocage ('' si aucune ou déjà remplies)
+  reqHtml(kind, idx) {
+    const r = GameEngine.getUnlockRequirement(kind, idx);
+    if (r.met || r.items.length === 0) return '';
+    return `<div class="req-list">${r.items.map(it =>
+      `<div>${it.done ? '✅' : '⬜'} ${it.have}${it.unit || ''} / ${it.need}${it.unit || ''} ${it.label}</div>`).join('')}</div>`;
+  },
+
   // --- Réservoir d'Éclats (affiché en haut de l'onglet Enclos) ---
   reservoirHtml() {
     const cap = GameEngine.getReservoirCap();

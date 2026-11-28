@@ -173,7 +173,7 @@ Object.assign(UI, {
         <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:10px;">${speciesDef.desc}</p>
         ${whyHtml}
         <div style="font-size:0.95rem;font-weight:800;color:#2ef2e0;margin-bottom:14px;">
-          Production : +${speciesDef.prod * (chromatic ? 3 : 1)} Éclats/s
+          Production : +${Utils.formatRate(Utils.specimenRate(speciesDef, chromatic))} Éclats/s
         </div>
         <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;">
           ${autoPlacedEnc ? `🏝️ Placé automatiquement dans <strong>${autoPlacedEnc}</strong>.` : '📦 Envoyé dans ta <strong>Réserve</strong> (enclos pleins).'}
@@ -259,6 +259,7 @@ Object.assign(UI, {
             <div style="font-weight:800;margin-bottom:6px;">Pour défier le Gardien :</div>
             ${[
               [req.species.have >= req.species.need, `${req.species.have} / ${req.species.need} espèces découvertes`],
+              [req.wins.have >= req.wins.need, `${req.wins.have} / ${req.wins.need} bonnes réponses au total`],
               [req.answers.have >= req.answers.need, `${req.answers.have} / ${req.answers.need} dernières réponses données`],
               [req.accuracy.have >= req.accuracy.need && req.answers.have >= req.answers.need, `Réussite récente : ${req.accuracy.have} % (objectif ${req.accuracy.need} %)`],
               [req.hard.have >= req.hard.need, `${req.hard.have} / ${req.hard.need} questions Difficiles réussies récemment`]

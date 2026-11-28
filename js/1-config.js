@@ -24,14 +24,15 @@ const CONFIG = {
   CHROMATIC_CHANCE: 0.01,        // 1% de base
   STREAK_CHROMATIC_BONUS: 0.05,  // +5% par niveau de Série/Combo
   MAX_CHROMATIC_CHANCE: 0.75,    // Plafond à 75% pour garder le frisson
+  PRODUCTION_MULT: 0.15,         // échelle globale de la production des créatures (équilibrage)
   CHROMATIC_PROD_MULT: 3,        // Une créature Chromatique produit x3
   CHROMATIC_AURA_BONUS: 0.10,    // +10% à l'enclos par Chromatique présent
   PITY_STEP: 10,                 // +10% à chaque éclosion Commune
   PITY_THRESHOLD: 100,           // À 100%, garantit Épique (75%) ou Légendaire (25%)
 
   // Timers rapides pour tester le gameplay en quelques minutes
-  INCUBATION_BASE_SEC: 6,
-  INCUBATION_PER_MANA_SEC: 1.2,  // Max ~12 secondes pour 5 doses
+  INCUBATION_BASE_SEC: 15,
+  INCUBATION_PER_MANA_SEC: 2,  // Max ~12 secondes pour 5 doses
   INSTABILITY_INTERVAL_SEC: 45,  // Un enclos devient instable toutes les ~45s
   INSTABILITY_PENALTY: 0.5,      // -50% de production tant que non stabilisé
 
@@ -42,12 +43,24 @@ const CONFIG = {
 
   // Coûts de progression du laboratoire
   ENCLOSURE_SLOTS: 3,
-  ENCLOSURE_COSTS: [0, 120, 480, 1400],
-  INCUBATOR_COSTS: [0, 320, 1100],
-  LAB_BOOST_COSTS: [200, 650, 1800, 4200],
-  GUARDIAN_SPECIES_REQ: 5,
+  ENCLOSURE_COSTS: [0, 300, 2000, 12000],
+  INCUBATOR_COSTS: [0, 700, 5000],
+  LAB_BOOST_COSTS: [600, 3000, 10000, 30000],
+
+  // Maîtrise requise EN PLUS des Éclats (D). Clés : wins = bonnes réponses au total,
+  // cat = bonnes réponses par catégorie (calcul | pourcentage | proba),
+  // accuracy = % de réussite sur les dernières réponses (fenêtre GUARDIAN_MASTERY.window)
+  ENCLOSURE_REQ: [null, { wins: 10 }, { wins: 60, cat: { pourcentage: 12 } }, { wins: 160, cat: { proba: 20, pourcentage: 20 }, accuracy: 70 }],
+  INCUBATOR_REQ: [null, { wins: 30, cat: { pourcentage: 5 } }, { wins: 110, cat: { proba: 12 }, accuracy: 70 }],
+  LAB_BOOST_REQ: [{ wins: 20 }, { wins: 70 }, { wins: 140 }, { wins: 240 }],
+  ACCURACY_MIN_ANSWERS: 10,      // réponses minimum pour évaluer un % de réussite
+
+  // Éclats : coût d'un œuf et récompense des exercices
+  EGG_SHARD_COST: 40,
+  SHARD_REWARD: { easy: 3, medium: 8, hard: 15 },
+  GUARDIAN_SPECIES_REQ: 7,
   // Maîtrise requise pour défier le Gardien (plus de passage payant)
-  GUARDIAN_MASTERY: { window: 20, minAccuracy: 0.7, minHard: 3 },
+  GUARDIAN_MASTERY: { window: 20, minAccuracy: 0.7, minHard: 3, minWins: 300 },
 
   // Fusion Risquée
   FUSION_SAFE_COUNT: 3,
@@ -66,14 +79,14 @@ const CONFIG = {
   // Progression par paliers : onglets et mécaniques débloqués au fil du jeu
   PROGRESSION: {
     enclosures: { eggsHatched: 1, label: 'Enclos',   hint: 'Fais éclore ton 1er œuf' },
-    producer:   { eggsHatched: 3, label: 'Production, Série et Surcharge', hint: 'Fais éclore 3 œufs' },
-    manadex:    { species: 3,     label: 'ManaDex',  hint: 'Découvre 3 espèces' },
+    producer:   { eggsHatched: 5, label: 'Production, Série et Surcharge', hint: 'Fais éclore 5 œufs' },
+    manadex:    { species: 4,     label: 'ManaDex',  hint: 'Découvre 4 espèces' },
     fusion:     {                 label: 'Fusion',   hint: 'Obtiens 2 exemplaires de la même espèce' },
-    guardian:   {                 label: 'Gardien Alpha', hint: 'Découvre 5 espèces' }
+    guardian:   {                 label: 'Gardien Alpha', hint: 'Découvre 7 espèces' }
   },
 
   // Paliers d'exercices : bonnes réponses nécessaires pour ouvrir Moyen / Difficile
-  EXERCISE_TIER_REQ: { easy: 0, medium: 5, hard: 15 },
+  EXERCISE_TIER_REQ: { easy: 0, medium: 8, hard: 40 },
 
   RARITY_ORDER: ['common', 'rare', 'epic', 'legendary'],
   RARITY_LABELS: {

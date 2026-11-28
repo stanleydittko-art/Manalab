@@ -5,9 +5,9 @@
 function createDefaultState() {
   return {
     version: CONFIG.SAVE_VERSION,
-    shards: 30,
+    shards: 60,
     reservoir: 0,   // Éclats produits en attente de récolte (voir CONFIG.RESERVOIR_CAP_SEC)
-    totalShardsEarned: 30,
+    totalShardsEarned: 60,
     mana: { raw: 2, pure: 0, prismatic: 0 },
     streak: 0,
     bestStreak: 0,
@@ -151,7 +151,7 @@ const Storage = {
         if (!uid) continue;
         const sp = state.specimens[uid];
         const def = sp && SPECIES[sp.speciesId];
-        if (def) encBase += def.prod * (sp.chromatic ? CONFIG.CHROMATIC_PROD_MULT : 1);
+        if (def) encBase += Utils.specimenRate(def, sp.chromatic);
       }
       if (enc.unstable) encBase *= CONFIG.INSTABILITY_PENALTY;
       rate += encBase * boostMult;

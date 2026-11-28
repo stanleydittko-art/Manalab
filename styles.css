@@ -1241,3 +1241,13 @@ html.high-contrast {
   border: 1px solid var(--accent-amber);
   background: rgba(251, 191, 36, 0.08);
 }
+
+/* Conditions de maîtrise d'un déblocage */
+.req-list {
+  margin: 4px 0 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}

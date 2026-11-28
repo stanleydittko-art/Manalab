@@ -1,6 +1,6 @@
 /* Service Worker ManaLab — cache hors-ligne complet.
    RÈGLE : incrémenter CACHE_NAME à chaque ajout/suppression/modification notable de fichier. */
-const CACHE_NAME = 'manalab-cache-v6';
+const CACHE_NAME = 'manalab-cache-v7';
 const FILES = [
   "./",
   "index.html",

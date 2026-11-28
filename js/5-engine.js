@@ -143,7 +143,7 @@ const GameEngine = {
     let chromaCount = 0;
     for (const c of creatures) {
       const def = SPECIES[c.speciesId];
-      baseProd += def.prod * (c.chromatic ? CONFIG.CHROMATIC_PROD_MULT : 1);
+      baseProd += Utils.specimenRate(def, c.chromatic);
       if (c.chromatic) chromaCount++;
     }
     const synBonus = activeSynergy ? activeSynergy.bonus : 0;
@@ -192,7 +192,7 @@ const GameEngine = {
   unlockEnclosure(enclosureId) {
     const enc = state.enclosures[enclosureId];
     const cost = CONFIG.ENCLOSURE_COSTS[enclosureId];
-    if (!enc || enc.unlocked || state.shards < cost) return false;
+    if (!enc || enc.unlocked || state.shards < cost || !this.getUnlockRequirement('enclosure', enclosureId).met) return false;
     state.shards -= cost;
     enc.unlocked = true;
     AudioFX.play('correct');
@@ -203,7 +203,7 @@ const GameEngine = {
 
   buyLabBoost() {
     const cost = CONFIG.LAB_BOOST_COSTS[state.labBoostLevel];
-    if (cost === undefined || state.shards < cost) return false;
+    if (cost === undefined || state.shards < cost || !this.getUnlockRequirement('boost', state.labBoostLevel).met) return false;
     state.shards -= cost;
     state.labBoostLevel++;
     AudioFX.play('correct');
@@ -239,7 +239,7 @@ const GameEngine = {
   unlockIncubator(incId) {
     const inc = state.incubators[incId];
     const cost = CONFIG.INCUBATOR_COSTS[incId];
-    if (!inc || inc.unlocked || state.shards < cost) return false;
+    if (!inc || inc.unlocked || state.shards < cost || !this.getUnlockRequirement('incubator', incId).met) return false;
     state.shards -= cost;
     inc.unlocked = true;
     AudioFX.play('correct');
@@ -258,6 +258,11 @@ const GameEngine = {
     if (sel.raw > state.mana.raw || sel.pure > state.mana.pure || sel.prismatic > state.mana.prismatic) {
       return { ok: false, msg: 'Stock de Mana insuffisant.' };
     }
+
+    if (state.shards < CONFIG.EGG_SHARD_COST) {
+      return { ok: false, msg: `Il faut ${CONFIG.EGG_SHARD_COST} ✦ pour lancer un œuf : récolte ton réservoir ou fais un exercice.` };
+    }
+    state.shards -= CONFIG.EGG_SHARD_COST;
 
     // Consommer le Mana
     state.mana.raw -= sel.raw;
@@ -402,7 +407,7 @@ const GameEngine = {
     state.mana[manaKey] += gained;
 
     // Petit gain d'Éclats immédiat pour renforcer le plaisir
-    const shardBonus = difficulty === 'hard' ? 35 : (difficulty === 'medium' ? 18 : 8);
+    const shardBonus = CONFIG.SHARD_REWARD[difficulty] || CONFIG.SHARD_REWARD.easy;
     state.shards += shardBonus;
     state.totalShardsEarned += shardBonus;
 
@@ -482,9 +487,10 @@ const GameEngine = {
     const answers = { have: recent.length, need: M.window };
     const acc = { have: accuracy, need: Math.round(M.minAccuracy * 100) };
     const hard = { have: hardOk, need: M.minHard };
-    const ok = species.have >= species.need && answers.have >= answers.need
+    const wins = { have: state.stats.exercisesWon, need: M.minWins };
+    const ok = species.have >= species.need && wins.have >= wins.need && answers.have >= answers.need
       && acc.have >= acc.need && hard.have >= hard.need;
-    return { species, answers, accuracy: acc, hard, ok };
+    return { species, wins, answers, accuracy: acc, hard, ok };
   },
 
   canChallengeGuardian() {

@@ -248,37 +248,37 @@ const SPECIES = {
   },
   // RARES (3)
   tupa_lave: {
-    id: 'tupa_lave', name: 'Tupa de Lave', rarity: 'rare', type: 'Faune', prod: 14,
+    id: 'tupa_lave', name: 'Tupa de Lave', rarity: 'rare', type: 'Faune', prod: 9,
     desc: 'Né près des coulées de basalte, ses pinces crépitent d’énergie volcanique.'
   },
   tiare_volt: {
-    id: 'tiare_volt', name: 'Tiare-Volt', rarity: 'rare', type: 'Flore', prod: 16,
+    id: 'tiare_volt', name: 'Tiare-Volt', rarity: 'rare', type: 'Flore', prod: 10,
     desc: 'Ses six pétales agissent comme des bobines électriques chargées par les alizés.'
   },
   maito_neon: {
-    id: 'maito_neon', name: 'Maito Néon', rarity: 'rare', type: 'Marin', prod: 15,
+    id: 'maito_neon', name: 'Maito Néon', rarity: 'rare', type: 'Marin', prod: 10,
     desc: 'Poisson chirurgien bioluminescent qui trace des sillages fluo sous la passe.'
   },
   // ÉPIQUES (3)
   honu_cristal: {
-    id: 'honu_cristal', name: 'Honu Cristal', rarity: 'epic', type: 'Marin', prod: 42,
+    id: 'honu_cristal', name: 'Honu Cristal', rarity: 'epic', type: 'Marin', prod: 18,
     desc: 'Tortue ancestrale à carapace d’améthyste capable de diffracter le Mana pur.'
   },
   puhi_plasma: {
-    id: 'puhi_plasma', name: 'Puhi Plasma', rarity: 'epic', type: 'Marin', prod: 48,
+    id: 'puhi_plasma', name: 'Puhi Plasma', rarity: 'epic', type: 'Marin', prod: 20,
     desc: 'Murène des récifs profonds entourée d’une aura de plasma instable.'
   },
   fai_eclipse: {
-    id: 'fai_eclipse', name: 'Fai Éclipse', rarity: 'epic', type: 'Marin', prod: 52,
+    id: 'fai_eclipse', name: 'Fai Éclipse', rarity: 'epic', type: 'Marin', prod: 22,
     desc: 'Raie manta silencieuse portant l’empreinte lumineuse d’une éclipse totale.'
   },
   // LÉGENDAIRES (2)
   moo_celeste: {
-    id: 'moo_celeste', name: "Mo'o Céleste", rarity: 'legendary', type: 'Faune', prod: 135,
+    id: 'moo_celeste', name: "Mo'o Céleste", rarity: 'legendary', type: 'Faune', prod: 40,
     desc: 'Spécimen mythique né directement du fragment d’étoile Te Feti’a.'
   },
   tupa_solaire: {
-    id: 'tupa_solaire', name: "Tupa d'Or Solaire", rarity: 'legendary', type: 'Faune', prod: 150,
+    id: 'tupa_solaire', name: "Tupa d'Or Solaire", rarity: 'legendary', type: 'Faune', prod: 45,
     desc: 'Souverain doré du lagon dont l’aura rayonne sur toute la station ManaLab.'
   }
 };
