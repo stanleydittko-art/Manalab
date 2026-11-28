@@ -40,7 +40,7 @@ const ctx = {
 ctx.window = ctx; ctx.addEventListener = () => {};
 vm.createContext(ctx);
 const src = scripts.map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n;\n');
-vm.runInContext(src + '\n;this.__t = { CONFIG, state: () => state, GameEngine, ProbaEngine, ExerciseGenerators, Storage, Utils, UI, ACHIEVEMENTS, SPECIES_LIST, createDefaultState };', ctx);
+vm.runInContext(src + '\n;this.__t = { CONFIG, state: () => state, GameEngine, ProbaEngine, ExerciseGenerators, Storage, Utils, UI, ACHIEVEMENTS, SPECIES_LIST, createDefaultState, Vivarium, Mascot, SPECIES };', ctx);
 const T = ctx.__t;
 check('Les 13+ scripts se chargent sans erreur', true);
 
@@ -132,6 +132,21 @@ check('unlockAll débloque tout', Object.values(T.state().unlocked).every(Boolea
   check('Gardien ouvert : 5 espèces, 70 %, 3 Difficiles', eng.canChallengeGuardian() === true);
   fill(19, 19, 3);
   check('Gardien fermé : moins de 20 réponses', eng.canChallengeGuardian() === false);
+}
+
+// --- Vivarium & mascotte ---
+{
+  const st = T.state();
+  const ids = Object.keys(T.SPECIES);
+  st.enclosures[0].unlocked = true;
+  const n = Math.min(st.enclosures[0].slots.length, 3);
+  for (let i = 0; i < n; i++) { st.specimens['v' + i] = { uid: 'v' + i, speciesId: ids[i], chromatic: false }; st.enclosures[0].slots[i] = 'v' + i; }
+  check('Vivarium : liste les créatures placées', T.Vivarium.placed().length === n);
+  const m = T.CONFIG.VIVARIUM_MAX;
+  check('Vivarium : plafond de créatures animées', typeof m === 'number' && m >= 6 && m <= 20);
+  T.Vivarium.reducedMotion = () => true;
+  check('Vivarium : sans erreur en animations réduites', (() => { try { T.Vivarium.celebrate(); return true; } catch (e) { return false; } })());
+  check('Mascotte : phrases + séries configurées', T.Mascot.PHRASES.win.length > 0 && T.CONFIG.MASCOT_STREAKS.length > 0 && T.Mascot.svg().includes('<svg'));
 }
 
 console.log(failures === 0 ? '\nTous les tests passent.' : `\n${failures} test(s) en échec.`);

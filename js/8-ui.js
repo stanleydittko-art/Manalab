@@ -57,7 +57,7 @@ const UI = {
     document.getElementById('hud-shards').textContent = Utils.formatNum(state.shards);
     document.getElementById('hud-prod-rate').textContent = `+${prod.toFixed(1).replace(/\.0$/, '')}/s`;
 
-    if (this.activeTab === 'enclosures') this.updateReservoirDisplay();
+    if (this.activeTab === 'enclosures') { this.updateReservoirDisplay(); Vivarium.updatePile(); }
 
     // Mettre à jour les barres de progression d'incubation en place
     if (this.activeTab === 'incubator') {

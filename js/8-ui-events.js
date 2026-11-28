@@ -133,6 +133,7 @@ Object.assign(UI, {
           this.openHatchModal(Number(el.dataset.inc));
           break;
 
+        case 'collect-pile':
         case 'collect': {
           if (GameEngine.getCollectGain() <= 0) break;
           EffortBridge.requestAction(
@@ -141,8 +142,9 @@ Object.assign(UI, {
             () => {
               const gain = GameEngine.collectReservoir();
               this.showToast(`💎 +${Utils.formatNum(gain)} Éclats récoltés !`, 'gold');
+              Mascot.react('collect');
             },
-            () => this.showToast('Récolte ratée : ton réservoir est intact, réessaie !', 'danger')
+            () => { this.showToast('Récolte ratée : ton réservoir est intact, réessaie !', 'danger'); Mascot.react('fail'); }
           );
           break;
         }
@@ -162,8 +164,9 @@ Object.assign(UI, {
               const rew = GameEngine.grantExerciseReward(diff);
               const names = { raw: 'Mana Brut', pure: 'Mana Pur', prismatic: 'Mana Prismatique' };
               this.showToast(`+${rew.gained} ${names[rew.manaKey]} & +${rew.shardBonus} ✦ !`, rew.bonusDose ? 'gold' : 'cyan');
+              Mascot.react('win');
             },
-            () => this.showToast('Série réinitialisée ! Analyse l’explication et retente.', 'danger')
+            () => { this.showToast('Série réinitialisée ! Analyse l’explication et retente.', 'danger'); Mascot.react('fail'); }
           );
           break;
         }

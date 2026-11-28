@@ -132,3 +132,7 @@ Réponds toujours en **français**, de façon concise (**5 puces maximum**) :
 ## Équilibrage
 - Tous les coûts/conditions de maîtrise sont dans `js/1-config.js` (`*_COSTS`, `*_REQ`, `GUARDIAN_MASTERY`, `PRODUCTION_MULT`).
 - Après tout changement d'équilibrage : `node tools/sim.js 260 3` (élève virtuel, 3 questions/min). Cible actuelle : Gardien ≈ 100–130 min.
+
+## Vivarium & mascotte Tiki
+- `js/7-fx-vivarium.js` : scène animée de l'onglet Enclos (créatures qui marchent, tas de cristaux = bouton de récolte). Purement visuel ; déplacements par transitions CSS ; doit respecter `prefers-reduced-motion` et se mettre en pause hors de l'onglet.
+- `js/8-ui-mascot.js` : Tiki, voix de la « Mission du moment » et réactions (`Mascot.react('win'|'fail'|'collect')`). Réglages dans `CONFIG` (`VIVARIUM_MAX`, `MASCOT_STREAKS`).

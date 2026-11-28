@@ -95,6 +95,7 @@ Object.assign(UI, {
           </div>
           <button class="btn btn-sm btn-ghost" data-action="goto-tab" data-target="exercises">⚡ Gagner du Mana</button>
         </div>
+        ${Vivarium.sceneHtml()}
         ${this.reservoirHtml()}
         <div class="enclosures-grid">${enclosuresHtml}</div>
         <div class="upgrades-row">
@@ -121,6 +122,7 @@ Object.assign(UI, {
         ${reserveHtml}
       </div>
     `;
+    Vivarium.mount();
   },
 
   // --- ONGLET 2 : INCUBATEUR & PROBABILITÉS ---

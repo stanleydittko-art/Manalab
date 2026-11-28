@@ -68,6 +68,8 @@ const CONFIG = {
   FUSION_RISKY_CHANCE: 0.65,
 
   // Réservoir d'Éclats : la production remplit un réservoir plafonné, à vider avec un flash-quiz
+  VIVARIUM_MAX: 12,              // créatures animées affichées dans l'enclos
+  MASCOT_STREAKS: [3, 5, 10, 20], // séries de bonnes réponses saluées par Tiki
   RESERVOIR_CAP_SEC: 600,        // capacité = 10 minutes de production
   RESERVOIR_ALERT_RATIO: 0.8,    // alerte « réservoir presque plein » à 80 %
   COLLECT_STREAK_BONUS: 0.05,    // +5 % de gain par bonne réponse d'affilée...

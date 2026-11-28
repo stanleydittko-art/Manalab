@@ -45,7 +45,8 @@ Object.assign(UI, {
     }
     bubble.style.display = '';
     bubble.dataset.tab = mission.tab;
-    bubble.textContent = `🎯 ${mission.text}`;
+    const txt = Mascot.ensure(bubble);
+    if (!Mascot.isSpeaking()) txt.textContent = mission.text;
     const target = mission.tab === 'guardian'
       ? document.getElementById('btn-guardian-tab')
       : document.querySelector(`.nav-tab[data-tab="${mission.tab}"]`);
@@ -110,6 +111,7 @@ Object.assign(UI, {
     state.seenTips[key] = true;
     this.openModal(`
       <div style="text-align:center;">
+        <div class="tiki tiki-lg" data-mood="happy">${Mascot.svg()}</div>
         <h2 style="margin-bottom:10px;">${tip.title}</h2>
         <p style="font-size:0.95rem;line-height:1.45;margin-bottom:16px;">${tip.text}</p>
         <button id="btn-tip-ok" class="btn btn-primary" style="width:100%;">OK, compris !</button>
