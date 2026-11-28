@@ -34,6 +34,20 @@ const Utils = {
     return entries[entries.length - 1][0];
   },
 
+  // Arrondit des pourcentages à l'entier en garantissant une somme EXACTE de 100
+  // (méthode du plus grand reste). `weights` : { clé: valeur >= 0 } ; renvoie des entiers.
+  roundTo100(weights) {
+    const keys = Object.keys(weights);
+    const total = keys.reduce((a, k) => a + weights[k], 0) || 1;
+    const raw = keys.map(k => ({ k, v: (weights[k] / total) * 100 }));
+    const out = {};
+    let used = 0;
+    for (const r of raw) { out[r.k] = Math.floor(r.v); used += out[r.k]; }
+    raw.sort((a, b) => (b.v - Math.floor(b.v)) - (a.v - Math.floor(a.v)));
+    for (let i = 0; i < 100 - used; i++) out[raw[i % raw.length].k]++;
+    return out;
+  },
+
   randomOf(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }

@@ -42,12 +42,8 @@ const ProbaEngine = {
     applyShift(sel.pure || 0, CONFIG.MANA_SHIFTS.pure);
     applyShift(sel.prismatic || 0, CONFIG.MANA_SHIFTS.prismatic);
 
-    // Normalisation stricte à 100.0%
-    const sum = common + rare + epic + legendary;
-    common = Math.round((common / sum) * 1000) / 10;
-    rare = Math.round((rare / sum) * 1000) / 10;
-    epic = Math.round((epic / sum) * 1000) / 10;
-    legendary = Math.max(0, Math.round((100 - common - rare - epic) * 10) / 10);
+    // Normalisation stricte à 100 % (entiers, somme exacte)
+    ({ common, rare, epic, legendary } = Utils.roundTo100({ common, rare, epic, legendary }));
 
     return { common, rare, epic, legendary, pityTriggered: false };
   },
@@ -77,11 +73,7 @@ const ProbaEngine = {
       epic -= shift;
       legendary += shift;
     }
-    const sum = common + rare + epic + legendary;
-    common = Math.round((common / sum) * 1000) / 10;
-    rare = Math.round((rare / sum) * 1000) / 10;
-    epic = Math.round((epic / sum) * 1000) / 10;
-    legendary = Math.max(0, Math.round((100 - common - rare - epic) * 10) / 10);
+    ({ common, rare, epic, legendary } = Utils.roundTo100({ common, rare, epic, legendary }));
     return { common, rare, epic, legendary, overcharged: true };
   },
 

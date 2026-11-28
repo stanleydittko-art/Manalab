@@ -1136,3 +1136,25 @@ html, body {
   font-size: 0.92rem;
   cursor: pointer;
 }
+
+/* ========================================================================
+   ERGONOMIE TACTILE (>= 44px) & HUD COMPACT MOBILE
+   ======================================================================== */
+.btn, .nav-tab, .stepper-btn { min-height: 44px; }
+.stepper-btn { min-width: 44px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; }
+.proba-seg { overflow: hidden; white-space: nowrap; font-size: 0.74rem; }
+
+@media (max-width: 640px) {
+  .hud-header { padding: 10px 12px; margin-bottom: 10px; }
+  .hud-top-row { margin-bottom: 8px; gap: 8px; }
+  .brand-title { font-size: 1rem; }
+  .brand-icon { width: 34px; height: 34px; }
+  .brand-sub .biome-pill { font-size: 0.64rem; }
+  .hud-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .stat-chip { padding: 6px 9px; gap: 1px; }
+  .stat-label { font-size: 0.64rem; }
+  .stat-value { font-size: 1rem; }
+  .hud-hint { display: none; }
+  .nav-bar { gap: 6px; margin-bottom: 12px; }
+}
